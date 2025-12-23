@@ -1,5 +1,5 @@
-
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' show TimeOfDay;
 import '../models/user_preferences.dart';
 import '../services/local_storage_service.dart';
 import '../models/bible_book.dart';
@@ -31,12 +31,44 @@ class UserProvider with ChangeNotifier {
   Future<void> completeOnboarding() async {
     _hasCompletedOnboarding = true;
     await _storageService.saveOnboardingStatus(true);
+    // Also ensure current preferences are saved
+    await _storageService.saveUserPreferences(_preferences);
     notifyListeners();
   }
 
   Future<void> updatePreferences(UserPreferences newPrefs) async {
     _preferences = newPrefs;
     await _storageService.saveUserPreferences(newPrefs);
+    notifyListeners();
+  }
+  
+  Future<void> savePreference(String key, dynamic value) async {
+    // Update local object
+    if (key == 'isDarkMode') {
+      _preferences.isDarkMode = value;
+    } else if (key == 'fontSize') {
+      _preferences.fontSize = value;
+    } else if (key == 'selectedBibleVersion') {
+      _preferences.selectedBibleVersion = value;
+    } else if (key == 'isNotificationEnabled') {
+      _preferences.isNotificationEnabled = value;
+    } else if (key == 'dailyNotificationTime') {
+      // Assuming value is String "HH:mm"
+      final parts = value.split(':');
+      _preferences.dailyNotificationTime = TimeOfDay(
+        hour: int.parse(parts[0]),
+        minute: int.parse(parts[1]),
+      );
+    }
+    
+    // Save to disk
+    await _storageService.saveUserPreferences(_preferences);
+    notifyListeners();
+  }
+
+  Future<void> updateBibleVersion(String newVersion) async {
+    _preferences.selectedBibleVersion = newVersion;
+    await _storageService.saveUserPreferences(_preferences);
     notifyListeners();
   }
 
@@ -48,14 +80,14 @@ class UserProvider with ChangeNotifier {
     if (!_bookmarks.any((v) => v.text == verse.text && v.bookName == verse.bookName)) {
       _bookmarks.add(verse);
       notifyListeners();
-      // TODO: Persist bookmarks
+      // TODO: Persist bookmarks in LocalStorageService
     }
   }
 
   void removeBookmark(BibleVerse verse) {
     _bookmarks.removeWhere((v) => v.text == verse.text && v.bookName == verse.bookName);
     notifyListeners();
-    // TODO: Persist bookmarks
+    // TODO: Persist bookmarks in LocalStorageService
   }
 
   void toggleBookmark(BibleVerse verse) {
@@ -77,7 +109,7 @@ class UserProvider with ChangeNotifier {
         _readingHistory.removeLast();
       }
       notifyListeners();
-      // TODO: Persist history
+      // TODO: Persist history in LocalStorageService
     }
   }
 }

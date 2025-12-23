@@ -1,36 +1,56 @@
-
 import 'package:flutter/foundation.dart';
 import '../models/bible_book.dart';
-import '../models/bible_chapter.dart';
 import '../models/bible_verse.dart';
 import '../services/bible_service.dart';
 
 class BibleProvider with ChangeNotifier {
   final BibleService _bibleService = BibleService();
   
-  List<BibleBook> _books = [];
-  List<BibleBook> get books => _books;
+  List<BibleBook> get books => _bibleService.loadBibleDataSync();
   
   List<Map<String, dynamic>> _versions = [];
   List<Map<String, dynamic>> get versions => _versions;
   
   bool _isLoading = false;
-  bool get isLoading => _isLoading;
+  bool get isLoading => _isLoading || _bibleService.isDownloading;
 
-  Future<void> loadBibleData() async {
+  BibleProvider() {
+    _bibleService.addListener(_onServiceChanged);
+    _loadVersions();
+  }
+
+  Future<void> _loadVersions() async {
+    _versions = await _bibleService.getAvailableVersions();
+    notifyListeners();
+  }
+
+  void _onServiceChanged() {
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _bibleService.removeListener(_onServiceChanged);
+    super.dispose();
+  }
+
+  Future<void> loadBibleData({String? version}) async {
     _isLoading = true;
     notifyListeners();
     
-    _books = await _bibleService.loadBibleData();
-    _versions = await _bibleService.getAvailableVersions();
+    await _bibleService.loadBibleData(version: version);
     
     _isLoading = false;
     notifyListeners();
   }
 
+  Future<List<Map<String, dynamic>>> getAvailableVersions() async {
+    return await _bibleService.getAvailableVersions();
+  }
+
   List<BibleVerse> getAllVerses() {
     List<BibleVerse> allVerses = [];
-    for (var book in _books) {
+    for (var book in books) {
       for (var chapter in book.chapters) {
         allVerses.addAll(chapter.verses);
       }
@@ -42,11 +62,9 @@ class BibleProvider with ChangeNotifier {
     final allVerses = getAllVerses();
     if (allVerses.isEmpty) return null;
 
-    // Use day of year as seed
     final now = DateTime.now();
     final dayOfYear = int.parse("${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}");
     
-    // Simple seeded random selection
     return allVerses[dayOfYear % allVerses.length];
   }
 }

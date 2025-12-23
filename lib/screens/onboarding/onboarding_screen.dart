@@ -1,3 +1,4 @@
+import '../../widgets/download_progress_dialog.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -34,8 +35,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _completeOnboarding() async {
-    await context.read<UserProvider>().completeOnboarding();
-    // main.dart will rebuild and switch to HomeScreen automatically based on provider state
+    final userProvider = context.read<UserProvider>();
+    final selectedVersion = userProvider.preferences.selectedBibleVersion;
+    
+    // Show download dialog
+    final success = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => DownloadProgressDialog(bibleVersion: selectedVersion),
+    );
+    
+    if (success == true) {
+      await userProvider.completeOnboarding();
+      // Navigator push handled by main app or provider listener usually, 
+      // but completing onboarding triggers main to rebuild.
+    } else {
+      // Handle failure or cancellation?
+      // For now, if cancelled, stay on onboarding.
+    }
   }
 
   @override

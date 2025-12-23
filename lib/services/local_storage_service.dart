@@ -1,9 +1,15 @@
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
+import 'package:logger/logger.dart';
 import '../models/user_preferences.dart';
 import '../models/bookmark.dart';
+import '../models/bible_database.dart';
+import '../models/bible_book.dart';
+import '../models/bible_chapter.dart';
+import '../models/bible_verse.dart';
 
 class LocalStorageService {
   static const String KEY_ONBOARDING_COMPLETED = 'onboarding_completed';
@@ -14,6 +20,187 @@ class LocalStorageService {
   static const String KEY_NOTIF_TIME_HOUR = 'notification_time_hour';
   static const String KEY_NOTIF_TIME_MINUTE = 'notification_time_minute';
   static const String KEY_BOOKMARKS = 'bookmarks';
+
+  static Database? _database;
+  final Logger _logger = Logger();
+
+  Future<Database> get database async {
+    if (_database != null) return _database!;
+    _database = await _initDatabase();
+    return _database!;
+  }
+
+  Future<Database> _initDatabase() async {
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, 'bible_app.db');
+
+    return await openDatabase(
+      path,
+      version: 1,
+      onCreate: (db, version) async {
+        await db.execute(BibleDataTable.createTableSql);
+        await db.execute(BibleMetadataTable.createTableSql);
+      },
+    );
+  }
+
+  Future<void> saveBibleData(String version, String jsonString) async {
+    final db = await database;
+    final data = jsonDecode(jsonString);
+    final books = data['books'] as List;
+
+    final batch = db.batch();
+
+    for (var book in books) {
+      final bookId = book['id'];
+      final bookName = book['name'];
+      final chapters = book['chapters'] as List;
+
+      for (var chapter in chapters) {
+        final chapterNumber = chapter['chapterNumber'];
+        final verses = chapter['verses'] as List;
+
+        for (var verse in verses) {
+          batch.insert(
+            BibleDataTable.tableName,
+            {
+              BibleDataTable.columnVersion: version,
+              BibleDataTable.columnBookId: bookId,
+              BibleDataTable.columnBookName: bookName,
+              BibleDataTable.columnChapterNumber: chapterNumber,
+              BibleDataTable.columnVerseNumber: verse['verseNumber'],
+              BibleDataTable.columnVerseText: verse['text'],
+              BibleDataTable.columnCreatedAt: DateTime.now().toIso8601String(),
+            },
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+        }
+      }
+    }
+
+    await batch.commit(noResult: true);
+    _logger.i('Saved Bible data for version: $version');
+  }
+
+  Future<void> saveBibleMetadata(String version, Map<String, dynamic> metadata) async {
+    final db = await database;
+    await db.insert(
+      BibleMetadataTable.tableName,
+      {
+        BibleMetadataTable.columnVersion: version,
+        BibleMetadataTable.columnDownloadedAt: metadata['downloadedAt'],
+        BibleMetadataTable.columnSize: metadata['size'],
+        BibleMetadataTable.columnVerseCount: 0, // Placeholder, can be calculated
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+  
+  Future<List<BibleBook>> loadBibleData(String version) async {
+    final db = await database;
+    
+    // Get all verses ordered by book, chapter, verse
+    final List<Map<String, dynamic>> maps = await db.query(
+      BibleDataTable.tableName,
+      where: '${BibleDataTable.columnVersion} = ?',
+      whereArgs: [version],
+      orderBy: '${BibleDataTable.columnBookId}, ${BibleDataTable.columnChapterNumber}, ${BibleDataTable.columnVerseNumber}',
+    );
+
+    if (maps.isEmpty) return [];
+
+    // Transform flat list of verses into hierarchical structure
+    List<BibleBook> books = [];
+    int currentBookId = -1;
+    BibleBook? currentBook;
+    int currentChapterNum = -1;
+    BibleChapter? currentChapter;
+
+    for (var map in maps) {
+      int bookId = map[BibleDataTable.columnBookId];
+      String bookName = map[BibleDataTable.columnBookName];
+      int chapterNum = map[BibleDataTable.columnChapterNumber];
+      int verseNum = map[BibleDataTable.columnVerseNumber];
+      String verseText = map[BibleDataTable.columnVerseText];
+
+      if (bookId != currentBookId) {
+        currentBook = BibleBook(
+            id: bookId, 
+            name: bookName, 
+            englishName: bookName, // Fallback to name if not stored
+            abbreviation: bookName.substring(0, 1), 
+            testament: bookId <= 39 ? 'old' : 'new', // Simple heuristic for Protestant Bible
+            totalChapters: 0, // Not stored in this table
+            chapters: []
+        );
+        books.add(currentBook);
+        currentBookId = bookId;
+        currentChapterNum = -1; 
+      }
+
+      if (chapterNum != currentChapterNum) {
+        currentChapter = BibleChapter(
+            chapterNumber: chapterNum, 
+            bookName: bookName,
+            verses: []
+        );
+        if (currentBook != null) {
+          currentBook.chapters.add(currentChapter);
+        }
+        currentChapterNum = chapterNum;
+      }
+
+      if (currentChapter != null) {
+        currentChapter.verses.add(
+          BibleVerse(
+            bookName: bookName,
+            chapterNumber: chapterNum,
+            verseNumber: verseNum,
+            text: verseText,
+          )
+        );
+      }
+    }
+    
+    return books;
+  }
+
+  Future<bool> isBibleDataExists(String version) async {
+    final db = await database;
+    final count = Sqflite.firstIntValue(await db.rawQuery(
+      'SELECT COUNT(*) FROM ${BibleMetadataTable.tableName} WHERE ${BibleMetadataTable.columnVersion} = ?',
+      [version],
+    ));
+    return (count ?? 0) > 0;
+  }
+  
+  Future<int> getBibleDataSize(String version) async {
+     final db = await database;
+     final List<Map<String, dynamic>> maps = await db.query(
+      BibleMetadataTable.tableName,
+      columns: [BibleMetadataTable.columnSize],
+      where: '${BibleMetadataTable.columnVersion} = ?',
+      whereArgs: [version],
+    );
+    if (maps.isNotEmpty) {
+      return maps.first[BibleMetadataTable.columnSize] as int;
+    }
+    return 0;
+  }
+
+  Future<void> deleteBibleData(String version) async {
+    final db = await database;
+    await db.delete(
+      BibleDataTable.tableName,
+      where: '${BibleDataTable.columnVersion} = ?',
+      whereArgs: [version],
+    );
+    await db.delete(
+      BibleMetadataTable.tableName,
+      where: '${BibleMetadataTable.columnVersion} = ?',
+      whereArgs: [version],
+    );
+  }
 
   Future<void> saveOnboardingStatus(bool completed) async {
     final prefs = await SharedPreferences.getInstance();
