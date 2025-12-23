@@ -27,4 +27,26 @@ class BibleProvider with ChangeNotifier {
     _isLoading = false;
     notifyListeners();
   }
+
+  List<BibleVerse> getAllVerses() {
+    List<BibleVerse> allVerses = [];
+    for (var book in _books) {
+      for (var chapter in book.chapters) {
+        allVerses.addAll(chapter.verses);
+      }
+    }
+    return allVerses;
+  }
+
+  BibleVerse? getTodayVerse() {
+    final allVerses = getAllVerses();
+    if (allVerses.isEmpty) return null;
+
+    // Use day of year as seed
+    final now = DateTime.now();
+    final dayOfYear = int.parse("${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}");
+    
+    // Simple seeded random selection
+    return allVerses[dayOfYear % allVerses.length];
+  }
 }

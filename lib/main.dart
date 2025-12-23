@@ -5,6 +5,7 @@ import 'providers/bible_provider.dart';
 import 'providers/user_provider.dart';
 import 'providers/theme_provider.dart';
 import 'screens/onboarding/onboarding_screen.dart';
+import 'screens/main_app.dart';
 
 
 void main() {
@@ -66,21 +67,9 @@ class _AppRootState extends State<AppRoot> {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: userProvider.hasCompletedOnboarding 
-          ? const PlaceholderHomeScreen() 
+          ? const MainApp() 
           : const OnboardingScreen(),
     );
   }
 }
 
-// Temporary placeholder for HomeScreen
-class PlaceholderHomeScreen extends StatelessWidget {
-  const PlaceholderHomeScreen({super.key});
-  
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Home Screen")),
-      body: const Center(child: Text("Home Screen Placeholder")),
-    );
-  }
-}
