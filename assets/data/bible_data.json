@@ -1,0 +1,83 @@
+
+{
+  "bibleVersions": [
+    {
+      "id": "krv",
+      "name": "개역개정",
+      "englishName": "Korean Revised Version",
+      "abbreviation": "개역개정"
+    },
+    {
+      "id": "knv",
+      "name": "새번역",
+      "englishName": "Korean New Version",
+      "abbreviation": "새번역"
+    },
+    {
+      "id": "krv-std",
+      "name": "표준새번역",
+      "englishName": "Korean Revised Standard Version",
+      "abbreviation": "표준새번역"
+    },
+    {
+      "id": "easy",
+      "name": "쉬운성경",
+      "englishName": "Easy Bible",
+      "abbreviation": "쉬운성경"
+    },
+    {
+      "id": "krv-old",
+      "name": "개역한글",
+      "englishName": "Korean Revised Version (Old)",
+      "abbreviation": "개역한글"
+    }
+  ],
+  "books": [
+    {
+      "id": 1,
+      "name": "창세기",
+      "englishName": "Genesis",
+      "abbreviation": "창",
+      "testament": "old",
+      "totalChapters": 50,
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "verses": [
+            {
+              "verseNumber": 1,
+              "text": "태초에 하나님이 천지를 창조하시니라"
+            },
+            {
+              "verseNumber": 2,
+              "text": "땅이 혼돈하고 공허하며 흑암이 깊음 위에 있고 하나님의 영은 수면 위에 운행하시니라"
+            },
+            {
+              "verseNumber": 3,
+              "text": "하나님이 이르시되 빛이 있으라 하시니 빛이 있었고"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "name": "마태복음",
+      "englishName": "Matthew",
+      "abbreviation": "마",
+      "testament": "new",
+      "totalChapters": 28,
+       "chapters": [
+        {
+          "chapterNumber": 1,
+          "verses": [
+            {
+              "verseNumber": 1,
+              "text": "아브라함과 다윗의 자손 예수 그리스도의 계보라"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
