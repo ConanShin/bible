@@ -6,7 +6,7 @@ import 'providers/user_provider.dart';
 import 'providers/theme_provider.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/main_app.dart';
-
+import 'services/bible_service.dart';
 
 void main() {
   runApp(const BibleApp());
@@ -19,7 +19,12 @@ class BibleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => BibleProvider()),
+        ChangeNotifierProvider(create: (_) => BibleService()),
+        ChangeNotifierProxyProvider<BibleService, BibleProvider>(
+          create: (context) => BibleProvider(context.read<BibleService>()),
+          update: (context, bibleService, previous) =>
+              previous ?? BibleProvider(bibleService),
+        ),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
@@ -44,7 +49,9 @@ class _AppRootState extends State<AppRoot> {
       context.read<UserProvider>().loadState().then((_) {
         // Sync theme with loaded preferences
         final userProvider = context.read<UserProvider>();
-        context.read<ThemeProvider>().setDarkMode(userProvider.preferences.isDarkMode);
+        context.read<ThemeProvider>().setDarkMode(
+          userProvider.preferences.isDarkMode,
+        );
       });
       context.read<BibleProvider>().loadBibleData();
     });
@@ -66,10 +73,9 @@ class _AppRootState extends State<AppRoot> {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: userProvider.hasCompletedOnboarding 
-          ? const MainApp() 
+      home: userProvider.hasCompletedOnboarding
+          ? const MainApp()
           : const OnboardingScreen(),
     );
   }
 }
-

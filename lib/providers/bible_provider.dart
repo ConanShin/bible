@@ -4,17 +4,17 @@ import '../models/bible_verse.dart';
 import '../services/bible_service.dart';
 
 class BibleProvider with ChangeNotifier {
-  final BibleService _bibleService = BibleService();
-  
+  final BibleService _bibleService;
+
   List<BibleBook> get books => _bibleService.loadBibleDataSync();
-  
+
   List<Map<String, dynamic>> _versions = [];
   List<Map<String, dynamic>> get versions => _versions;
-  
+
   bool _isLoading = false;
   bool get isLoading => _isLoading || _bibleService.isDownloading;
 
-  BibleProvider() {
+  BibleProvider(this._bibleService) {
     _bibleService.addListener(_onServiceChanged);
     _loadVersions();
   }
@@ -37,9 +37,9 @@ class BibleProvider with ChangeNotifier {
   Future<void> loadBibleData({String? version}) async {
     _isLoading = true;
     notifyListeners();
-    
+
     await _bibleService.loadBibleData(version: version);
-    
+
     _isLoading = false;
     notifyListeners();
   }
@@ -63,8 +63,10 @@ class BibleProvider with ChangeNotifier {
     if (allVerses.isEmpty) return null;
 
     final now = DateTime.now();
-    final dayOfYear = int.parse("${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}");
-    
+    final dayOfYear = int.parse(
+      "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}",
+    );
+
     return allVerses[dayOfYear % allVerses.length];
   }
 }

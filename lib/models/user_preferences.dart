@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class UserPreferences {
@@ -9,7 +8,7 @@ class UserPreferences {
   bool isNotificationEnabled;
 
   UserPreferences({
-    this.selectedBibleVersion = '개역개정',
+    this.selectedBibleVersion = 'krv',
     this.fontSize = 16.0,
     this.isDarkMode = false,
     this.dailyNotificationTime = const TimeOfDay(hour: 6, minute: 0),

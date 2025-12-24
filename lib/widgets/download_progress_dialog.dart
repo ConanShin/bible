@@ -1,97 +1,125 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import '../services/bible_service.dart';
 import 'package:provider/provider.dart';
 
 class DownloadProgressDialog extends StatefulWidget {
   final String bibleVersion;
-  
-  const DownloadProgressDialog({
-    required this.bibleVersion,
-    Key? key,
-  }) : super(key: key);
+
+  const DownloadProgressDialog({required this.bibleVersion, Key? key})
+    : super(key: key);
 
   @override
   State<DownloadProgressDialog> createState() => _DownloadProgressDialogState();
 }
 
 class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
-  double _progress = 0.0;
+  final CancelToken _cancelToken = CancelToken();
+  double? _progress;
   String _currentFile = '';
   String _progressText = '0%';
-  String _sizeText = '0 MB / 0 MB';
+  String _sizeText = '0 MB';
   bool _isDownloading = true;
   String? _errorMessage;
-  
+
   @override
   void initState() {
     super.initState();
     _startDownload();
   }
-  
+
+  @override
+  void dispose() {
+    if (_isDownloading) {
+      _cancelToken.cancel('Dialog disposed');
+    }
+    super.dispose();
+  }
+
   Future<void> _startDownload() async {
     final bibleService = context.read<BibleService>();
-    
+
     try {
       await bibleService.downloadBibleData(
         version: widget.bibleVersion,
+        cancelToken: _cancelToken,
         onProgress: (received, total) {
           if (mounted) {
             setState(() {
-              _progress = total != 0 ? received / total : 0;
-              _progressText = '${(_progress * 100).toStringAsFixed(1)}%';
-              _sizeText = '${(received / 1024 / 1024).toStringAsFixed(1)} MB / ${(total / 1024 / 1024).toStringAsFixed(1)} MB';
+              int actualTotal = total;
+              if (actualTotal == -1) {
+                // Approximate 6MB for progress calculation if total is unknown
+                actualTotal = 6 * 1024 * 1024;
+              }
+
+              _progress = received / actualTotal;
+              if (_progress! > 0.99 && total == -1)
+                _progress = 0.99; // Cap at 99% if total is unknown
+
+              _progressText = '${(_progress! * 100).toStringAsFixed(1)}%';
+
+              final receivedMB = (received / 1024 / 1024).toStringAsFixed(1);
+              if (total != -1) {
+                final totalMB = (total / 1024 / 1024).toStringAsFixed(1);
+                _sizeText = '$receivedMB MB / $totalMB MB';
+              } else {
+                _sizeText = '$receivedMB MB / ~6.0 MB';
+              }
             });
           }
         },
       );
-      
+
       if (mounted) {
         setState(() {
           _progress = 1.0;
           _progressText = '100%';
           _isDownloading = false;
         });
-        
-        // Close dialog after short delay
-        await Future.delayed(const Duration(seconds: 1));
-        if (mounted) {
-          Navigator.pop(context, true); // Return true on success
-        }
+
+        // Close dialog immediately
+        Navigator.pop(context, true); // Return true on success
       }
     } catch (e) {
       if (mounted) {
         setState(() {
           _isDownloading = false;
-          _errorMessage = e.toString();
+          if (e is DioException && e.type == DioExceptionType.cancel) {
+            _errorMessage = 'Download cancelled';
+          } else {
+            _errorMessage = e.toString();
+          }
         });
       }
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(_errorMessage == null ? 'Downloading Bible Data' : 'Download Failed'),
+      title: Text(
+        _errorMessage == null ? 'Downloading Bible Data' : 'Download Failed',
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (_errorMessage != null) ...[
-             Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
-             const SizedBox(height: 16),
+            Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+            const SizedBox(height: 16),
           ] else ...[
             // Progress Bar
-            LinearProgressIndicator(
-              value: _progress,
-              minHeight: 8,
-            ),
+            LinearProgressIndicator(value: _progress, minHeight: 8),
             const SizedBox(height: 16),
-            
+
             // Progress Text
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(_progressText, style: Theme.of(context).textTheme.bodyLarge),
+                Text(
+                  _progressText,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
                 Text(_sizeText, style: Theme.of(context).textTheme.bodySmall),
               ],
             ),
@@ -100,26 +128,35 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
               'Downloads are required for offline access.',
               style: Theme.of(context).textTheme.bodySmall,
             ),
-          ]
+          ],
         ],
       ),
       actions: [
         if (_errorMessage != null)
-           TextButton(
-             onPressed: () {
-               setState(() {
-                 _errorMessage = null;
-                 _isDownloading = true;
-                 _progress = 0;
-               });
-               _startDownload();
-             },
-             child: const Text('Retry'),
-           ),
-           
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _errorMessage = null;
+                _isDownloading = true;
+                _progress = 0;
+              });
+              _startDownload();
+            },
+            child: const Text('Retry'),
+          ),
+
         TextButton(
-          onPressed: _isDownloading ? null : () => Navigator.pop(context, false),
-          child: Text(_errorMessage == null && !_isDownloading ? 'Close' : 'Cancel'),
+          onPressed: () {
+            if (_isDownloading) {
+              _cancelToken.cancel('User cancelled');
+              Navigator.pop(context, false);
+            } else {
+              Navigator.pop(context, false);
+            }
+          },
+          child: Text(
+            _errorMessage == null && !_isDownloading ? 'Close' : 'Cancel',
+          ),
         ),
       ],
     );

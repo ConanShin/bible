@@ -37,17 +37,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _completeOnboarding() async {
     final userProvider = context.read<UserProvider>();
     final selectedVersion = userProvider.preferences.selectedBibleVersion;
-    
+
     // Show download dialog
     final success = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => DownloadProgressDialog(bibleVersion: selectedVersion),
+      builder: (context) =>
+          DownloadProgressDialog(bibleVersion: selectedVersion),
     );
-    
-    if (success == true) {
+
+    if (success == true && mounted) {
       await userProvider.completeOnboarding();
-      // Navigator push handled by main app or provider listener usually, 
+      // Navigator push handled by main app or provider listener usually,
       // but completing onboarding triggers main to rebuild.
     } else {
       // Handle failure or cancellation?
@@ -72,10 +73,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
                 children: [
                   Step1Welcome(onNext: _nextPage),
-                  Step2BibleSelection(
-                    onNext: _nextPage,
-                    onBack: _prevPage,
-                  ),
+                  Step2BibleSelection(onNext: _nextPage, onBack: _prevPage),
                   Step3Settings(
                     onBack: _prevPage,
                     onComplete: _completeOnboarding,
@@ -83,9 +81,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ],
               ),
             ),
-            
+
             // Page Indicator
-            if (_currentPage < 2) // Hide on settings screen ? Or keep it. Design says 3 dots.
+            if (_currentPage <
+                2) // Hide on settings screen ? Or keep it. Design says 3 dots.
               Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.xl),
                 child: Row(

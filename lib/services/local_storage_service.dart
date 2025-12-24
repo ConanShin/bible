@@ -13,7 +13,8 @@ import '../models/bible_verse.dart';
 
 class LocalStorageService {
   static const String KEY_ONBOARDING_COMPLETED = 'onboarding_completed';
-  static const String KEY_THEME_MODE = 'is_dark_mode'; // true: dark, false: light
+  static const String KEY_THEME_MODE =
+      'is_dark_mode'; // true: dark, false: light
   static const String KEY_FONT_SIZE = 'font_size';
   static const String KEY_BIBLE_VERSION = 'bible_version';
   static const String KEY_NOTIF_ENABLED = 'notification_enabled';
@@ -61,19 +62,15 @@ class LocalStorageService {
         final verses = chapter['verses'] as List;
 
         for (var verse in verses) {
-          batch.insert(
-            BibleDataTable.tableName,
-            {
-              BibleDataTable.columnVersion: version,
-              BibleDataTable.columnBookId: bookId,
-              BibleDataTable.columnBookName: bookName,
-              BibleDataTable.columnChapterNumber: chapterNumber,
-              BibleDataTable.columnVerseNumber: verse['verseNumber'],
-              BibleDataTable.columnVerseText: verse['text'],
-              BibleDataTable.columnCreatedAt: DateTime.now().toIso8601String(),
-            },
-            conflictAlgorithm: ConflictAlgorithm.replace,
-          );
+          batch.insert(BibleDataTable.tableName, {
+            BibleDataTable.columnVersion: version,
+            BibleDataTable.columnBookId: bookId,
+            BibleDataTable.columnBookName: bookName,
+            BibleDataTable.columnChapterNumber: chapterNumber,
+            BibleDataTable.columnVerseNumber: verse['verseNumber'],
+            BibleDataTable.columnVerseText: verse['text'],
+            BibleDataTable.columnCreatedAt: DateTime.now().toIso8601String(),
+          }, conflictAlgorithm: ConflictAlgorithm.replace);
         }
       }
     }
@@ -82,29 +79,29 @@ class LocalStorageService {
     _logger.i('Saved Bible data for version: $version');
   }
 
-  Future<void> saveBibleMetadata(String version, Map<String, dynamic> metadata) async {
+  Future<void> saveBibleMetadata(
+    String version,
+    Map<String, dynamic> metadata,
+  ) async {
     final db = await database;
-    await db.insert(
-      BibleMetadataTable.tableName,
-      {
-        BibleMetadataTable.columnVersion: version,
-        BibleMetadataTable.columnDownloadedAt: metadata['downloadedAt'],
-        BibleMetadataTable.columnSize: metadata['size'],
-        BibleMetadataTable.columnVerseCount: 0, // Placeholder, can be calculated
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await db.insert(BibleMetadataTable.tableName, {
+      BibleMetadataTable.columnVersion: version,
+      BibleMetadataTable.columnDownloadedAt: metadata['downloadedAt'],
+      BibleMetadataTable.columnSize: metadata['size'],
+      BibleMetadataTable.columnVerseCount: 0, // Placeholder, can be calculated
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
-  
+
   Future<List<BibleBook>> loadBibleData(String version) async {
     final db = await database;
-    
+
     // Get all verses ordered by book, chapter, verse
     final List<Map<String, dynamic>> maps = await db.query(
       BibleDataTable.tableName,
       where: '${BibleDataTable.columnVersion} = ?',
       whereArgs: [version],
-      orderBy: '${BibleDataTable.columnBookId}, ${BibleDataTable.columnChapterNumber}, ${BibleDataTable.columnVerseNumber}',
+      orderBy:
+          '${BibleDataTable.columnBookId}, ${BibleDataTable.columnChapterNumber}, ${BibleDataTable.columnVerseNumber}',
     );
 
     if (maps.isEmpty) return [];
@@ -125,24 +122,26 @@ class LocalStorageService {
 
       if (bookId != currentBookId) {
         currentBook = BibleBook(
-            id: bookId, 
-            name: bookName, 
-            englishName: bookName, // Fallback to name if not stored
-            abbreviation: bookName.substring(0, 1), 
-            testament: bookId <= 39 ? 'old' : 'new', // Simple heuristic for Protestant Bible
-            totalChapters: 0, // Not stored in this table
-            chapters: []
+          id: bookId,
+          name: bookName,
+          englishName: bookName, // Fallback to name if not stored
+          abbreviation: bookName.substring(0, 1),
+          testament: bookId <= 39
+              ? 'old'
+              : 'new', // Simple heuristic for Protestant Bible
+          totalChapters: 0, // Not stored in this table
+          chapters: [],
         );
         books.add(currentBook);
         currentBookId = bookId;
-        currentChapterNum = -1; 
+        currentChapterNum = -1;
       }
 
       if (chapterNum != currentChapterNum) {
         currentChapter = BibleChapter(
-            chapterNumber: chapterNum, 
-            bookName: bookName,
-            verses: []
+          chapterNumber: chapterNum,
+          bookName: bookName,
+          verses: [],
         );
         if (currentBook != null) {
           currentBook.chapters.add(currentChapter);
@@ -157,26 +156,28 @@ class LocalStorageService {
             chapterNumber: chapterNum,
             verseNumber: verseNum,
             text: verseText,
-          )
+          ),
         );
       }
     }
-    
+
     return books;
   }
 
   Future<bool> isBibleDataExists(String version) async {
     final db = await database;
-    final count = Sqflite.firstIntValue(await db.rawQuery(
-      'SELECT COUNT(*) FROM ${BibleMetadataTable.tableName} WHERE ${BibleMetadataTable.columnVersion} = ?',
-      [version],
-    ));
+    final count = Sqflite.firstIntValue(
+      await db.rawQuery(
+        'SELECT COUNT(*) FROM ${BibleMetadataTable.tableName} WHERE ${BibleMetadataTable.columnVersion} = ?',
+        [version],
+      ),
+    );
     return (count ?? 0) > 0;
   }
-  
+
   Future<int> getBibleDataSize(String version) async {
-     final db = await database;
-     final List<Map<String, dynamic>> maps = await db.query(
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
       BibleMetadataTable.tableName,
       columns: [BibleMetadataTable.columnSize],
       where: '${BibleMetadataTable.columnVersion} = ?',
@@ -224,10 +225,13 @@ class LocalStorageService {
 
   Future<UserPreferences> getUserPreferences() async {
     final sp = await SharedPreferences.getInstance();
+    final storedVersion = sp.getString(KEY_BIBLE_VERSION) ?? 'krv';
+    final version = _migrateLegacyVersion(storedVersion);
+
     return UserPreferences(
       isDarkMode: sp.getBool(KEY_THEME_MODE) ?? false,
       fontSize: sp.getDouble(KEY_FONT_SIZE) ?? 16.0,
-      selectedBibleVersion: sp.getString(KEY_BIBLE_VERSION) ?? '개역개정',
+      selectedBibleVersion: version,
       isNotificationEnabled: sp.getBool(KEY_NOTIF_ENABLED) ?? false,
       dailyNotificationTime: TimeOfDay(
         hour: sp.getInt(KEY_NOTIF_TIME_HOUR) ?? 6,
@@ -235,6 +239,16 @@ class LocalStorageService {
       ),
     );
   }
-  
+
+  String _migrateLegacyVersion(String version) {
+    const migrationMap = {
+      '개역개정': 'krv',
+      '새번역': 'knv',
+      '쉬운성경': 'easy',
+      '개역한글': 'rv',
+    };
+    return migrationMap[version] ?? version;
+  }
+
   // Future: Implement bookmarks save/load
 }
