@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class AppColors {
@@ -6,6 +5,10 @@ class AppColors {
   static const Color primaryBrand = Color(0xFF2C6E7F);
   static const Color primaryLight = Color(0xFF4A9FB4);
   static const Color primaryDark = Color(0xFF1D4F5F);
+
+  // Testament Colors
+  static const Color oldTestament = Color(0xFF1A237E); // Dark Navy
+  static const Color newTestament = Color(0xFF5D4037); // Dark Brown
 
   // Background & Surface
   static const Color background = Color(0xFFF8F9FA);

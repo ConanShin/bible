@@ -4,44 +4,65 @@ import '../models/user_preferences.dart';
 import '../services/local_storage_service.dart';
 import '../models/bible_book.dart';
 import '../models/bible_verse.dart';
+import '../models/reading_history_item.dart';
+import '../providers/bible_provider.dart';
+import '../models/bible_database.dart';
 
 class UserProvider with ChangeNotifier {
-  final LocalStorageService _storageService = LocalStorageService();
-  
-  UserPreferences _preferences = UserPreferences();
-  UserPreferences get preferences => _preferences;
-  
-  bool _hasCompletedOnboarding = false;
-  bool get hasCompletedOnboarding => _hasCompletedOnboarding;
-  
+  final LocalStorageService _storage = LocalStorageService();
   bool _isLoading = true;
   bool get isLoading => _isLoading;
 
-  Future<void> loadState() async {
+  UserPreferences _preferences = UserPreferences();
+  UserPreferences get preferences => _preferences;
+
+  bool _hasCompletedOnboarding = false;
+  bool get hasCompletedOnboarding => _hasCompletedOnboarding;
+
+  Future<void> loadState(BibleProvider bibleProvider) async {
     _isLoading = true;
     notifyListeners();
-    
-    _hasCompletedOnboarding = await _storageService.getOnboardingStatus();
-    _preferences = await _storageService.getUserPreferences();
-    
+
+    _hasCompletedOnboarding = await _storage.getOnboardingStatus();
+    _preferences = await _storage.getUserPreferences();
+
+    // Load history from SQLite
+    final historyData = await _storage.getHistory();
+    final books = bibleProvider.books;
+
+    _readingHistory = historyData.map((map) {
+      final bookId = map[ReadingHistoryTable.columnBookId] as int;
+      final book = books.firstWhere(
+        (b) => b.id == bookId,
+        orElse: () => books.first,
+      );
+
+      return ReadingHistoryItem(
+        book: book,
+        chapterNumber: map[ReadingHistoryTable.columnChapterNumber] as int,
+        verseNumber: map[ReadingHistoryTable.columnVerseNumber] as int,
+        timestamp: DateTime.parse(map[ReadingHistoryTable.columnTimestamp]),
+      );
+    }).toList();
+
     _isLoading = false;
     notifyListeners();
   }
 
   Future<void> completeOnboarding() async {
     _hasCompletedOnboarding = true;
-    await _storageService.saveOnboardingStatus(true);
+    await _storage.saveOnboardingStatus(true);
     // Also ensure current preferences are saved
-    await _storageService.saveUserPreferences(_preferences);
+    await _storage.saveUserPreferences(_preferences);
     notifyListeners();
   }
 
   Future<void> updatePreferences(UserPreferences newPrefs) async {
     _preferences = newPrefs;
-    await _storageService.saveUserPreferences(newPrefs);
+    await _storage.saveUserPreferences(newPrefs);
     notifyListeners();
   }
-  
+
   Future<void> savePreference(String key, dynamic value) async {
     // Update local object
     if (key == 'isDarkMode') {
@@ -60,15 +81,15 @@ class UserProvider with ChangeNotifier {
         minute: int.parse(parts[1]),
       );
     }
-    
+
     // Save to disk
-    await _storageService.saveUserPreferences(_preferences);
+    await _storage.saveUserPreferences(_preferences);
     notifyListeners();
   }
 
   Future<void> updateBibleVersion(String newVersion) async {
     _preferences.selectedBibleVersion = newVersion;
-    await _storageService.saveUserPreferences(_preferences);
+    await _storage.saveUserPreferences(_preferences);
     notifyListeners();
   }
 
@@ -77,7 +98,9 @@ class UserProvider with ChangeNotifier {
   List<BibleVerse> get bookmarks => _bookmarks;
 
   void addBookmark(BibleVerse verse) {
-    if (!_bookmarks.any((v) => v.text == verse.text && v.bookName == verse.bookName)) {
+    if (!_bookmarks.any(
+      (v) => v.text == verse.text && v.bookName == verse.bookName,
+    )) {
       _bookmarks.add(verse);
       notifyListeners();
       // TODO: Persist bookmarks in LocalStorageService
@@ -85,13 +108,17 @@ class UserProvider with ChangeNotifier {
   }
 
   void removeBookmark(BibleVerse verse) {
-    _bookmarks.removeWhere((v) => v.text == verse.text && v.bookName == verse.bookName);
+    _bookmarks.removeWhere(
+      (v) => v.text == verse.text && v.bookName == verse.bookName,
+    );
     notifyListeners();
     // TODO: Persist bookmarks in LocalStorageService
   }
 
   void toggleBookmark(BibleVerse verse) {
-    if (_bookmarks.any((v) => v.text == verse.text && v.bookName == verse.bookName)) {
+    if (_bookmarks.any(
+      (v) => v.text == verse.text && v.bookName == verse.bookName,
+    )) {
       removeBookmark(verse);
     } else {
       addBookmark(verse);
@@ -99,17 +126,38 @@ class UserProvider with ChangeNotifier {
   }
 
   // Reading History (placeholder for now using BibleBook as item)
-  List<BibleBook> _readingHistory = [];
-  List<BibleBook> get readingHistory => _readingHistory;
+  List<ReadingHistoryItem> _readingHistory = [];
+  List<ReadingHistoryItem> get readingHistory => _readingHistory;
 
-  void addToHistory(BibleBook book) {
-    if (!_readingHistory.contains(book)) {
-      _readingHistory.insert(0, book);
-      if (_readingHistory.length > 5) {
-        _readingHistory.removeLast();
-      }
-      notifyListeners();
-      // TODO: Persist history in LocalStorageService
+  void addToHistory(BibleBook book, int chapterNumber, int verseNumber) async {
+    // Remove if already exists with same content to avoid duplicates and move to top
+    _readingHistory.removeWhere(
+      (item) =>
+          item.book.id == book.id &&
+          item.chapterNumber == chapterNumber &&
+          item.verseNumber == verseNumber,
+    );
+
+    _readingHistory.insert(
+      0,
+      ReadingHistoryItem(
+        book: book,
+        chapterNumber: chapterNumber,
+        verseNumber: verseNumber,
+        timestamp: DateTime.now(),
+      ),
+    );
+
+    if (_readingHistory.length > 20) {
+      _readingHistory.removeLast();
     }
+
+    notifyListeners();
+
+    // Persist to SQLite
+    await _storage.saveHistoryItem(book.id, chapterNumber, verseNumber);
+    print(
+      "Saved to persistent history: ${book.name} $chapterNumber:$verseNumber",
+    );
   }
 }

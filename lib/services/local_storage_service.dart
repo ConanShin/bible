@@ -37,10 +37,16 @@ class LocalStorageService {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         await db.execute(BibleDataTable.createTableSql);
         await db.execute(BibleMetadataTable.createTableSql);
+        await db.execute(ReadingHistoryTable.createTableSql);
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute(ReadingHistoryTable.createTableSql);
+        }
       },
     );
   }
@@ -250,5 +256,35 @@ class LocalStorageService {
     return migrationMap[version] ?? version;
   }
 
-  // Future: Implement bookmarks save/load
+  // --- Reading History ---
+
+  Future<void> saveHistoryItem(
+    int bookId,
+    int chapterNumber,
+    int verseNumber,
+  ) async {
+    final db = await database;
+    final timestamp = DateTime.now().toIso8601String();
+
+    await db.insert(ReadingHistoryTable.tableName, {
+      ReadingHistoryTable.columnBookId: bookId,
+      ReadingHistoryTable.columnChapterNumber: chapterNumber,
+      ReadingHistoryTable.columnVerseNumber: verseNumber,
+      ReadingHistoryTable.columnTimestamp: timestamp,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<List<Map<String, dynamic>>> getHistory() async {
+    final db = await database;
+    return await db.query(
+      ReadingHistoryTable.tableName,
+      orderBy: '${ReadingHistoryTable.columnTimestamp} DESC',
+      limit: 20,
+    );
+  }
+
+  Future<void> clearHistory() async {
+    final db = await database;
+    await db.delete(ReadingHistoryTable.tableName);
+  }
 }

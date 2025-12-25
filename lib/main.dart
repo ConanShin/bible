@@ -46,14 +46,16 @@ class _AppRootState extends State<AppRoot> {
     super.initState();
     // Load initial data
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<UserProvider>().loadState().then((_) {
-        // Sync theme with loaded preferences
-        final userProvider = context.read<UserProvider>();
-        context.read<ThemeProvider>().setDarkMode(
-          userProvider.preferences.isDarkMode,
-        );
+      final bibleProvider = context.read<BibleProvider>();
+      bibleProvider.loadBibleData().then((_) {
+        context.read<UserProvider>().loadState(bibleProvider).then((_) {
+          // Sync theme with loaded preferences
+          final userProvider = context.read<UserProvider>();
+          context.read<ThemeProvider>().setDarkMode(
+            userProvider.preferences.isDarkMode,
+          );
+        });
       });
-      context.read<BibleProvider>().loadBibleData();
     });
   }
 

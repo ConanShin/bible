@@ -1,111 +1,179 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../providers/bible_provider.dart';
 import '../providers/user_provider.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_text_styles.dart';
-import '../models/bible_verse.dart';
 
 class TodayVerseCard extends StatelessWidget {
   const TodayVerseCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Watch BibleProvider for the verse
-    // Note: In a real app, we might want to fetch this once or use a FutureBuilder if it's async
-    // But since getAllVerses is sync (after load), we can just access it.
     final bibleProvider = context.watch<BibleProvider>();
     final verse = bibleProvider.getTodayVerse();
 
     if (verse == null) {
-      return const SizedBox.shrink(); // or a loading shimmer
+      return const SizedBox.shrink();
     }
 
-    // Watch UserProvider for bookmark status
     final userProvider = context.watch<UserProvider>();
-    // Ensure verse is treated as non-null. Since we returned if null above, we can safely bang it.
-    final nonNullVerse = verse!; 
-    final isBookmarked = userProvider.bookmarks.any((v) => 
-      v.text == nonNullVerse.text && v.bookName == nonNullVerse.bookName && v.chapterNumber == nonNullVerse.chapterNumber && v.verseNumber == nonNullVerse.verseNumber
+    final isBookmarked = userProvider.bookmarks.any(
+      (v) =>
+          v.text == verse.text &&
+          v.bookName == verse.bookName &&
+          v.chapterNumber == verse.chapterNumber &&
+          v.verseNumber == verse.verseNumber,
     );
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      height: 240,
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: AppColors.primaryLight, // #4A9FB4
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(24),
+        image: const DecorationImage(
+          image: AssetImage('assets/images/today_verse_bg.png'),
+          fit: BoxFit.cover,
+        ),
         boxShadow: [
           BoxShadow(
-            // ignore: deprecated_member_use
-            color: Colors.black.withOpacity(0.1), 
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '"${nonNullVerse.text}"',
-            style: AppTextStyles.bodyLarge.copyWith(
-              color: Colors.white,
-              height: 1.6,
-            ),
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            '${nonNullVerse.bookName} ${nonNullVerse.chapterNumber}:${nonNullVerse.verseNumber}',
-            style: AppTextStyles.bodySmall.copyWith(
-              color: Colors.white,
-            ),
-          ),
-          Text(
-            '개역개정', // Assuming version
-            style: AppTextStyles.caption.copyWith(
-              color: Colors.white70,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end, // Spec shows buttons on bottom
-            children: [
-              IconButton(
-                onPressed: () {
-                  userProvider.toggleBookmark(nonNullVerse);
-                },
-                icon: Icon(
-                  isBookmarked ? Icons.favorite : Icons.favorite_outline,
-                  color: Colors.white,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          children: [
+            // Glassmorphism Overlay
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.black.withOpacity(0.3),
+                        Colors.black.withOpacity(0.1),
+                      ],
+                    ),
+                  ),
                 ),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                iconSize: 24,
               ),
-              const SizedBox(width: 16),
-              IconButton(
-                onPressed: () {
-                  // Use Share (if SharePlus isn't found, revert. But try Share first as it's standard)
-                  // The error said: 'Share' is deprecated. Use SharePlus instead.
-                  // ignore: deprecated_member_use
-                  Share.share(
-                    '${nonNullVerse.text}\n\n${nonNullVerse.bookName} ${nonNullVerse.chapterNumber}:${nonNullVerse.verseNumber}',
-                  );
-                },
-                icon: const Icon(Icons.share_outlined, color: Colors.white), // Spec says share ->
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                iconSize: 24,
+            ),
+
+            // Content
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                          ),
+                        ),
+                        child: Text(
+                          '오늘의 말씀',
+                          style: GoogleFonts.notoSansKr(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          _ActionButton(
+                            icon: isBookmarked
+                                ? Icons.bookmark
+                                : Icons.bookmark_outline,
+                            onTap: () => userProvider.toggleBookmark(verse),
+                          ),
+                          const SizedBox(width: 12),
+                          _ActionButton(
+                            icon: Icons.share_outlined,
+                            onTap: () => Share.share(
+                              '${verse.text}\n\n${verse.bookName} ${verse.chapterNumber}:${verse.verseNumber}',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  Text(
+                    '“${verse.text}”',
+                    style: GoogleFonts.nanumMyeongjo(
+                      color: Colors.white,
+                      fontSize: 18,
+                      height: 1.6,
+                      fontWeight: FontWeight.w600,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(0.3),
+                          offset: const Offset(0, 2),
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '${verse.bookName} ${verse.chapterNumber}:${verse.verseNumber}',
+                    style: GoogleFonts.notoSansKr(
+                      color: Colors.white.withOpacity(0.9),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _ActionButton({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.2),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white.withOpacity(0.3)),
+        ),
+        child: Icon(icon, color: Colors.white, size: 20),
+      ),
+    );
+  }
+}
