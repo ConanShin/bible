@@ -45,6 +45,7 @@ class BibleMetadataTable {
   ''';
 }
 
+
 class ReadingHistoryTable {
   static const String tableName = 'reading_history';
 
@@ -66,3 +67,28 @@ class ReadingHistoryTable {
     )
   ''';
 }
+
+class BookmarkTable {
+  static const String tableName = 'bookmarks';
+
+  static const String columnId = 'id';
+  static const String columnBookName = 'book_name';
+  static const String columnChapterNumber = 'chapter_number';
+  static const String columnVerseNumber = 'verse_number';
+  static const String columnVerseText = 'verse_text';
+  static const String columnNote = 'note';
+  static const String columnCreatedAt = 'created_at';
+
+  static const String createTableSql = '''
+    CREATE TABLE IF NOT EXISTS $tableName (
+      $columnId TEXT PRIMARY KEY,
+      $columnBookName TEXT NOT NULL,
+      $columnChapterNumber INTEGER NOT NULL,
+      $columnVerseNumber INTEGER NOT NULL,
+      $columnVerseText TEXT NOT NULL,
+      $columnNote TEXT,
+      $columnCreatedAt TEXT NOT NULL
+    )
+  ''';
+}
+

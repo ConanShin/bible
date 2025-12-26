@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import '../../models/bible_book.dart';
 import '../../models/bible_chapter.dart';
 import '../../providers/bible_provider.dart';
+import '../../providers/bible_provider.dart';
 import '../../providers/user_provider.dart';
+import '../../models/bible_verse.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 
@@ -69,6 +71,114 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
     );
   }
 
+  void _showBookmarkModal(BuildContext context, BibleVerse verse) {
+    final userProvider = context.read<UserProvider>();
+    final isBookmarked = userProvider.isBookmarked(verse);
+    final existingBookmark = isBookmarked
+        ? userProvider.bookmarks.firstWhere(
+            (b) =>
+                b.bookName == verse.bookName &&
+                b.chapterNumber == verse.chapterNumber &&
+                b.verseNumber == verse.verseNumber,
+          )
+        : null;
+
+    final noteController = TextEditingController(text: existingBookmark?.note);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder:
+          (context) => Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${verse.bookName} ${verse.chapterNumber}:${verse.verseNumber}',
+                    style: AppTextStyles.heading3,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    verse.text,
+                    style: AppTextStyles.bodyNormal.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 24),
+                  TextField(
+                    controller: noteController,
+                    decoration: const InputDecoration(
+                      hintText: '메모를 입력하세요 (선택)',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.all(12),
+                    ),
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      if (isBookmarked)
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              userProvider.removeBookmark(verse);
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('북마크가 삭제되었습니다.')),
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.red,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                            ),
+                            child: const Text('삭제'),
+                          ),
+                        ),
+                      if (isBookmarked) const SizedBox(width: 16),
+                      Expanded(
+                        flex: 2,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            userProvider.addBookmark(
+                              verse,
+                              note: noteController.text,
+                            );
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('북마크가 저장되었습니다.')),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryBrand,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text('저장'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bibleProvider = context.read<BibleProvider>();
@@ -123,45 +233,71 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
             const SizedBox(height: 16),
             ...widget.chapter.verses.map((verse) {
               final isTarget = verse.verseNumber == widget.initialVerse;
+              final userProvider = context.watch<UserProvider>();
+              final isBookmarked = userProvider.isBookmarked(verse);
 
-              return Container(
-                key: _verseKeys[verse.verseNumber],
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: isTarget
-                      ? AppColors.primaryBrand.withOpacity(0.1)
-                      : null,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 30,
-                      child: Text(
-                        '${verse.verseNumber}',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.primaryBrand,
-                          fontWeight: FontWeight.bold,
+              return InkWell(
+                onTap: () => _showBookmarkModal(context, verse),
+                child: Container(
+                  key: _verseKeys[verse.verseNumber],
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12, // Increased padding for better touch target
+                  ),
+                  decoration: BoxDecoration(
+                    color:
+                        isTarget
+                            ? AppColors.primaryBrand.withOpacity(0.1)
+                            : (isBookmarked
+                                ? Colors.yellow.withOpacity(0.1)
+                                : null),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 35,
+                        child: Column(
+                          children: [
+                            Text(
+                              '${verse.verseNumber}',
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.primaryBrand,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            if (isBookmarked)
+                              const Padding(
+                                padding: EdgeInsets.only(top: 4.0),
+                                child: Icon(
+                                  Icons.bookmark,
+                                  size: 12,
+                                  color: AppColors.primaryBrand,
+                                ),
+                              ),
+                          ],
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        verse.text,
-                        style: AppTextStyles.bodyNormal.copyWith(
-                          fontSize: context
-                              .watch<UserProvider>()
-                              .preferences
-                              .fontSize,
-                          height: 1.6,
-                          color: AppColors.textPrimary,
+                      Expanded(
+                        child: Text(
+                          verse.text,
+                          style: AppTextStyles.bodyNormal.copyWith(
+                            fontSize:
+                                userProvider.preferences.fontSize,
+                            height: 1.6,
+                            color: AppColors.textPrimary,
+                            decoration:
+                                isBookmarked
+                                    ? TextDecoration.underline
+                                    : null,
+                            decorationColor: AppColors.primaryBrand
+                                .withOpacity(0.3),
+                            decorationStyle: TextDecorationStyle.dashed,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             }).toList(),

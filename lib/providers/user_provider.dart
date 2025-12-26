@@ -4,6 +4,7 @@ import '../models/user_preferences.dart';
 import '../services/local_storage_service.dart';
 import '../models/bible_book.dart';
 import '../models/bible_verse.dart';
+import '../models/bookmark.dart';
 import '../models/reading_history_item.dart';
 import '../providers/bible_provider.dart';
 import '../models/bible_database.dart';
@@ -44,6 +45,9 @@ class UserProvider with ChangeNotifier {
         timestamp: DateTime.parse(map[ReadingHistoryTable.columnTimestamp]),
       );
     }).toList();
+
+    // Load bookmarks
+    _bookmarks = await _storage.getBookmarks();
 
     _isLoading = false;
     notifyListeners();
@@ -94,35 +98,55 @@ class UserProvider with ChangeNotifier {
   }
 
   // Bookmarks
-  List<BibleVerse> _bookmarks = [];
-  List<BibleVerse> get bookmarks => _bookmarks;
+  List<Bookmark> _bookmarks = [];
+  List<Bookmark> get bookmarks => _bookmarks;
 
-  void addBookmark(BibleVerse verse) {
-    if (!_bookmarks.any(
-      (v) => v.text == verse.text && v.bookName == verse.bookName,
-    )) {
-      _bookmarks.add(verse);
-      notifyListeners();
-      // TODO: Persist bookmarks in LocalStorageService
-    }
-  }
-
-  void removeBookmark(BibleVerse verse) {
-    _bookmarks.removeWhere(
-      (v) => v.text == verse.text && v.bookName == verse.bookName,
+  bool isBookmarked(BibleVerse verse) {
+    return _bookmarks.any(
+      (b) =>
+          b.bookName == verse.bookName &&
+          b.chapterNumber == verse.chapterNumber &&
+          b.verseNumber == verse.verseNumber,
     );
-    notifyListeners();
-    // TODO: Persist bookmarks in LocalStorageService
   }
 
-  void toggleBookmark(BibleVerse verse) {
-    if (_bookmarks.any(
-      (v) => v.text == verse.text && v.bookName == verse.bookName,
-    )) {
-      removeBookmark(verse);
-    } else {
-      addBookmark(verse);
-    }
+  Future<void> addBookmark(BibleVerse verse, {String? note}) async {
+    final newBookmark = Bookmark(
+      id: '${verse.bookName}_${verse.chapterNumber}_${verse.verseNumber}',
+      verseText: verse.text,
+      bookName: verse.bookName,
+      chapterNumber: verse.chapterNumber,
+      verseNumber: verse.verseNumber,
+      createdAt: DateTime.now(),
+      note: note,
+    );
+
+    // Remove if exists (to update note)
+    _bookmarks.removeWhere(
+      (b) =>
+          b.bookName == verse.bookName &&
+          b.chapterNumber == verse.chapterNumber &&
+          b.verseNumber == verse.verseNumber,
+    );
+    
+    _bookmarks.insert(0, newBookmark);
+    notifyListeners();
+
+    await _storage.saveBookmark(newBookmark);
+  }
+
+  Future<void> removeBookmark(BibleVerse verse) async {
+    final id = '${verse.bookName}_${verse.chapterNumber}_${verse.verseNumber}';
+    _bookmarks.removeWhere((b) => b.id == id);
+    notifyListeners();
+
+    await _storage.deleteBookmark(id);
+  }
+  
+  Future<void> deleteBookmarkById(String id) async {
+    _bookmarks.removeWhere((b) => b.id == id);
+    notifyListeners();
+    await _storage.deleteBookmark(id);
   }
 
   // Reading History (placeholder for now using BibleBook as item)

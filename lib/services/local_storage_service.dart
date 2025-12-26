@@ -37,15 +37,19 @@ class LocalStorageService {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (db, version) async {
         await db.execute(BibleDataTable.createTableSql);
         await db.execute(BibleMetadataTable.createTableSql);
         await db.execute(ReadingHistoryTable.createTableSql);
+        await db.execute(BookmarkTable.createTableSql);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
           await db.execute(ReadingHistoryTable.createTableSql);
+        }
+        if (oldVersion < 3) {
+          await db.execute(BookmarkTable.createTableSql);
         }
       },
     );
@@ -299,5 +303,37 @@ class LocalStorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
     _logger.i('All local data and preferences cleared.');
+  }
+
+  // --- Bookmarks ---
+
+  Future<void> saveBookmark(Bookmark bookmark) async {
+    final db = await database;
+    await db.insert(
+      BookmarkTable.tableName,
+      bookmark.toJson(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> deleteBookmark(String id) async {
+    final db = await database;
+    await db.delete(
+      BookmarkTable.tableName,
+      where: '${BookmarkTable.columnId} = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<List<Bookmark>> getBookmarks() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      BookmarkTable.tableName,
+      orderBy: '${BookmarkTable.columnCreatedAt} DESC',
+    );
+
+    return List.generate(maps.length, (i) {
+      return Bookmark.fromJson(maps[i]);
+    });
   }
 }
