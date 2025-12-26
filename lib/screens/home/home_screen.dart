@@ -34,7 +34,10 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 0, 16, 12),
               child: Text(
                 '최근 읽은 기록',
-                style: AppTextStyles.heading3.copyWith(fontSize: 18),
+                style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
             ListView.builder(

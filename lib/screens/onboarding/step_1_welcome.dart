@@ -23,26 +23,31 @@ class Step1Welcome extends StatelessWidget {
             height: 120,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.primaryBrand.withOpacity(0.1),
+              color: Theme.of(context).primaryColor.withOpacity(0.1),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.menu_book_rounded,
               size: 60,
-              color: AppColors.primaryBrand,
+              color: Theme.of(context).primaryColor,
             ),
           ),
           const SizedBox(height: AppSpacing.xxxl),
           
           Text(
             "성경 읽기 여정을\n시작하세요",
-            style: AppTextStyles.heading1,
             textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.displayLarge?.copyWith(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
             "함께하는 말씀으로\n매일을 의미있게 만드세요.",
-            style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textSecondary),
             textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            ),
           ),
           
           const Spacer(),
@@ -53,7 +58,7 @@ class Step1Welcome extends StatelessWidget {
             child: ElevatedButton(
               onPressed: onNext,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryBrand,
+                backgroundColor: Theme.of(context).primaryColor,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),

@@ -16,8 +16,10 @@ class BookmarksScreen extends StatelessWidget {
     final bookmarks = userProvider.bookmarks;
     final fontSize = userProvider.preferences.fontSize;
 
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB), // Very light grey for background depth
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: bookmarks.isEmpty
           ? Center(
               child: Column(
@@ -26,13 +28,13 @@ class BookmarksScreen extends StatelessWidget {
                   Icon(
                     Icons.bookmark_border,
                     size: 64,
-                    color: AppColors.textTertiary.withOpacity(0.5),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     '저장된 북마크가 없습니다.',
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      color: AppColors.textSecondary,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                 ],
@@ -76,6 +78,8 @@ class _BookmarkItemState extends State<_BookmarkItem> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     return Dismissible(
       key: Key(widget.bookmark.id),
       direction: DismissDirection.endToStart,
@@ -106,11 +110,13 @@ class _BookmarkItemState extends State<_BookmarkItem> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: isDarkMode 
+                  ? Colors.black.withOpacity(0.2) 
+                  : Colors.black.withOpacity(0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -139,24 +145,23 @@ class _BookmarkItemState extends State<_BookmarkItem> {
                             width: 4,
                             height: 16,
                             decoration: BoxDecoration(
-                              color: AppColors.primaryBrand,
+                              color: Theme.of(context).primaryColor,
                               borderRadius: BorderRadius.circular(2),
                             ),
                           ),
                           const SizedBox(width: 8),
                           Text(
                             '${widget.bookmark.bookName} ${widget.bookmark.chapterNumber}:${widget.bookmark.verseNumber}',
-                            style: AppTextStyles.bodyLarge.copyWith(
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
                             ),
                           ),
                         ],
                       ),
                       Text(
                         _formatDate(widget.bookmark.createdAt),
-                        style: AppTextStyles.caption.copyWith(
-                          color: AppColors.textTertiary,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -170,8 +175,7 @@ class _BookmarkItemState extends State<_BookmarkItem> {
                     widget.bookmark.verseText,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.bodyNormal.copyWith(
-                      color: AppColors.textSecondary,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       height: 1.6,
                       fontSize: widget.fontSize,
                     ),
@@ -188,13 +192,20 @@ class _BookmarkItemState extends State<_BookmarkItem> {
                                 _isExpanded = !_isExpanded;
                               });
                             }
-                          : null, // Let parent InkWell handle it if not expandable?? No, if null, it passes through. Correct.
+                          : null, 
                       child: Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF8F9FA), // Very light grey
+                          color: isDarkMode 
+                              ? Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5) 
+                              : Theme.of(context).primaryColor.withOpacity(0.1), // Match primary theme color tint
                           borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isDarkMode 
+                                ? Colors.white.withOpacity(0.05) 
+                                : Theme.of(context).primaryColor.withOpacity(0.1),
+                          ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,14 +214,12 @@ class _BookmarkItemState extends State<_BookmarkItem> {
                               children: [
                                 Icon(Icons.edit_note,
                                     size: 16,
-                                    color:
-                                        AppColors.primaryBrand.withOpacity(0.7)),
+                                    color: Theme.of(context).primaryColor),
                                 const SizedBox(width: 6),
                                 Text(
                                   'MEMO',
-                                  style: AppTextStyles.caption.copyWith(
-                                    color: AppColors.primaryBrand
-                                        .withOpacity(0.7),
+                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: Theme.of(context).primaryColor,
                                     fontWeight: FontWeight.bold,
                                     letterSpacing: 0.5,
                                   ),
@@ -223,17 +232,14 @@ class _BookmarkItemState extends State<_BookmarkItem> {
                                 widget.bookmark.note!,
                                 maxLines: 3,
                                 overflow: TextOverflow.ellipsis,
-                                style: AppTextStyles.bodySmall.copyWith(
-                                  color: AppColors.textPrimary,
-                                  fontSize: widget.fontSize *
-                                      0.9, // Slightly smaller than verse
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  fontSize: widget.fontSize * 0.9,
                                   height: 1.5,
                                 ),
                               ),
                               secondChild: Text(
                                 widget.bookmark.note!,
-                                style: AppTextStyles.bodySmall.copyWith(
-                                  color: AppColors.textPrimary,
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                   fontSize: widget.fontSize * 0.9,
                                   height: 1.5,
                                 ),
@@ -251,8 +257,8 @@ class _BookmarkItemState extends State<_BookmarkItem> {
                                   children: [
                                     Text(
                                       _isExpanded ? '접기' : '전체 보기',
-                                      style: AppTextStyles.caption.copyWith(
-                                        color: AppColors.textTertiary,
+                                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -263,7 +269,7 @@ class _BookmarkItemState extends State<_BookmarkItem> {
                                       child: Icon(
                                         Icons.keyboard_arrow_down,
                                         size: 16,
-                                        color: AppColors.textTertiary,
+                                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                                       ),
                                     ),
                                   ],

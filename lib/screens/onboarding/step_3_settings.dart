@@ -30,7 +30,7 @@ class Step3Settings extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: onComplete,
-            child: Text("완료", style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryBrand, fontWeight: FontWeight.bold)),
+            child: Text("완료", style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -41,22 +41,22 @@ class Step3Settings extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("읽기 경험 설정", style: AppTextStyles.heading2),
+                Text("읽기 경험 설정", style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
                 const SizedBox(height: AppSpacing.xxxl),
                 
                 // Font Size Slider
-                Text("글자 크기", style: AppTextStyles.heading3.copyWith(fontSize: 16)),
+                Text("글자 크기", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: AppSpacing.sm),
                 Row(
                   children: [
-                    Text("가", style: AppTextStyles.bodySmall),
+                    Text("가", style: Theme.of(context).textTheme.bodySmall),
                     Expanded(
                       child: Slider(
                         value: userProvider.preferences.fontSize,
                         min: 12.0,
                         max: 24.0,
                         divisions: 6,
-                        activeColor: AppColors.primaryBrand,
+                        activeColor: Theme.of(context).primaryColor,
                         label: userProvider.preferences.fontSize.toString(),
                         onChanged: (value) {
                            UserPreferences newPrefs = userProvider.preferences;
@@ -65,7 +65,7 @@ class Step3Settings extends StatelessWidget {
                         },
                       ),
                     ),
-                    Text("가", style: AppTextStyles.heading2),
+                    Text("가", style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
                   ],
                 ),
                 
@@ -75,10 +75,10 @@ class Step3Settings extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("야간 모드", style: AppTextStyles.heading3.copyWith(fontSize: 16)),
+                    Text("야간 모드", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16, fontWeight: FontWeight.bold)),
                     Switch(
                       value: userProvider.preferences.isDarkMode,
-                      activeColor: AppColors.primaryBrand,
+                      activeColor: Theme.of(context).primaryColor,
                       onChanged: (value) {
                          UserPreferences newPrefs = userProvider.preferences;
                          newPrefs.isDarkMode = value;
@@ -89,11 +89,11 @@ class Step3Settings extends StatelessWidget {
                     ),
                   ],
                 ),
-                 
+                
                 const SizedBox(height: AppSpacing.xxxl),
                 
                 // Notification (Simple Toggle)
-                Text("자동 진행 (선택사항)", style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+                Text("자동 진행 (선택사항)", style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
                 const SizedBox(height: AppSpacing.sm),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -101,16 +101,16 @@ class Step3Settings extends StatelessWidget {
                    Column(
                      crossAxisAlignment: CrossAxisAlignment.start,
                      children: [
-                       Text("매일 알림 받기", style: AppTextStyles.heading3.copyWith(fontSize: 16)),
+                       Text("매일 알림 받기", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16, fontWeight: FontWeight.bold)),
                        Text(
                          "${userProvider.preferences.dailyNotificationTime.format(context)}에 알림", 
-                         style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)
+                         style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))
                        ),
                      ],
                    ),
                     Switch(
                       value: userProvider.preferences.isNotificationEnabled,
-                      activeColor: AppColors.primaryBrand,
+                      activeColor: Theme.of(context).primaryColor,
                       onChanged: (value) {
                          UserPreferences newPrefs = userProvider.preferences;
                          newPrefs.isNotificationEnabled = value;
@@ -146,7 +146,7 @@ class Step3Settings extends StatelessWidget {
                    child: ElevatedButton(
                      onPressed: onComplete,
                      style: ElevatedButton.styleFrom(
-                       backgroundColor: AppColors.primaryBrand,
+                       backgroundColor: Theme.of(context).primaryColor,
                        foregroundColor: Colors.white,
                        shape: RoundedRectangleBorder(
                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),

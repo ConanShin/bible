@@ -58,9 +58,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.background,
+                    color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    border: Border.all(
+                      color: Theme.of(context).dividerColor.withOpacity(0.1),
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,14 +70,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Text(
                         '창세기 1:1',
                         style: AppTextStyles.caption.copyWith(
-                          color: AppColors.primaryBrand,
+                          color: Theme.of(context).primaryColor,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         '태초에 하나님이 천지를 창조하시니라',
-                        style: AppTextStyles.bodyNormal.copyWith(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontSize: preferences.fontSize,
                           height: 1.5,
                         ),
@@ -175,8 +177,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             title: Text(
               '앱 초기화',
-              style: AppTextStyles.bodyNormal.copyWith(
-                color: AppColors.error
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.error,
               ),
             ),
             subtitle: const Text('모든 데이터가 삭제되고 초기 상태로 돌아갑니다.'),
@@ -206,7 +208,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
+              backgroundColor: Theme.of(context).colorScheme.error,
               foregroundColor: Colors.white,
             ),
             onPressed: () => Navigator.pop(context, true),
@@ -235,8 +237,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
       child: Text(
         title,
-        style: AppTextStyles.bodySmall.copyWith(
-          color: AppColors.textSecondary,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -265,7 +267,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               return ListTile(
                 title: Text(v['name']!),
                 trailing: currentVersion == v['id']
-                    ? const Icon(Icons.check, color: AppColors.primaryBrand)
+                    ? Icon(Icons.check, color: Theme.of(context).primaryColor)
                     : null,
                 onTap: () => Navigator.pop(context, v['id']),
               );

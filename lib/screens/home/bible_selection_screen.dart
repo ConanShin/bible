@@ -113,14 +113,14 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
       curve: Curves.easeInOutQuart,
       height: currentHeight,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(currentRadius),
         ),
       ),
       clipBehavior: Clip.antiAlias,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           automaticallyImplyLeading: false,
           title: AnimatedSwitcher(
@@ -147,8 +147,8 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
           ],
           centerTitle: true,
           elevation: 0,
-          backgroundColor: Colors.white,
-          foregroundColor: AppColors.textPrimary,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          foregroundColor: Theme.of(context).colorScheme.onSurface,
         ),
         body: Column(
           children: [
@@ -190,7 +190,7 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
 
   Widget _buildProgressBar() {
     // Decide color based on selected book or current step context
-    Color activeColor = AppColors.primaryBrand;
+    Color activeColor = Theme.of(context).primaryColor;
     if (_selectedBook != null) {
       activeColor = _selectedBook!.testament == 'old'
           ? AppColors.oldTestament
@@ -207,7 +207,7 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
               height: 3,
               margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
-                color: isActive ? activeColor : const Color(0xFFF3F4F6),
+                color: isActive ? activeColor : Theme.of(index < 0 ? context : context).dividerColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -230,13 +230,12 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
               Tab(text: '구약성경'),
               Tab(text: '신약성경'),
             ],
-            labelColor: AppColors.textPrimary,
-            unselectedLabelColor: AppColors.textTertiary,
+            labelColor: Theme.of(context).colorScheme.onSurface,
+            unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
             indicator: UnderlineTabIndicator(
               borderSide: BorderSide(
                 width: 3,
-                color: AppColors
-                    .primaryBrand, // Will be overridden or context-based?
+                color: Theme.of(context).primaryColor, 
               ),
             ),
             // Custom TabBar logic to support different colors for each tab
@@ -266,8 +265,8 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
           onTap: () => _onBookSelected(book),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: Color(0xFFF9FAFB))),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1))),
             ),
             child: Row(
               children: [
@@ -295,14 +294,14 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
                     children: [
                       Text(
                         book.name,
-                        style: AppTextStyles.bodyLarge.copyWith(
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       Text(
                         book.englishName,
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textTertiary,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                         ),
                       ),
                     ],
@@ -311,7 +310,7 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
                 Icon(
                   Icons.chevron_right,
                   size: 20,
-                  color: AppColors.textTertiary.withOpacity(0.5),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
                 ),
               ],
             ),
@@ -356,8 +355,8 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
           child: Text(
             subtitle,
-            style: AppTextStyles.bodyLarge.copyWith(
-              color: AppColors.textSecondary,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
             ),
           ),
         ),
@@ -377,8 +376,8 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: const Color(0xFFF3F4F6)),
+                    color: Theme.of(context).cardColor,
+                    border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(

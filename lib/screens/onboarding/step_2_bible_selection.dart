@@ -32,7 +32,7 @@ class Step2BibleSelection extends StatelessWidget {
             child: Text(
               "건너뛰기",
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               ),
             ),
           ),
@@ -89,20 +89,20 @@ class Step2BibleSelection extends StatelessWidget {
                             ),
                             padding: const EdgeInsets.all(AppSpacing.lg),
                             decoration: BoxDecoration(
-                              color: AppColors.surface,
+                              color: Theme.of(context).cardColor,
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusMd,
                               ),
                               border: Border.all(
                                 color: isSelected
-                                    ? AppColors.primaryBrand
-                                    : Colors.grey.shade200,
+                                    ? Theme.of(context).primaryColor
+                                    : Theme.of(context).dividerColor.withOpacity(0.1),
                                 width: isSelected ? 2 : 1,
                               ),
                               boxShadow: [
                                 if (isSelected)
                                   BoxShadow(
-                                    color: AppColors.primaryBrand.withOpacity(
+                                    color: Theme.of(context).primaryColor.withOpacity(
                                       0.1,
                                     ),
                                     blurRadius: 8,
@@ -119,24 +119,25 @@ class Step2BibleSelection extends StatelessWidget {
                                     children: [
                                       Text(
                                         versionName,
-                                        style: AppTextStyles.heading3.copyWith(
+                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                           fontSize: 18,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                       const SizedBox(height: AppSpacing.xs),
                                       Text(
                                         description,
-                                        style: AppTextStyles.bodySmall.copyWith(
-                                          color: AppColors.textSecondary,
+                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
                                 if (isSelected)
-                                  const Icon(
+                                  Icon(
                                     Icons.check_circle,
-                                    color: AppColors.success,
+                                    color: Theme.of(context).primaryColor,
                                   ),
                               ],
                             ),
@@ -155,7 +156,7 @@ class Step2BibleSelection extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: onNext,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryBrand,
+                      backgroundColor: Theme.of(context).primaryColor,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
+import 'package:flutter/material.dart';
 import 'home/home_screen.dart';
 import 'search/search_screen.dart';
 import 'bookmarks/bookmarks_screen.dart';
@@ -56,8 +56,8 @@ class _MainAppState extends State<MainApp> {
           style: TextStyle(fontWeight: FontWeight.bold), // Using default or style from theme
         ),
         elevation: 1,
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.textPrimary,
+        // backgroundColor: Colors.white, // Removed to support dark mode
+        // foregroundColor: AppColors.textPrimary, // Removed to support dark mode
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
@@ -87,8 +87,8 @@ class _MainAppState extends State<MainApp> {
         currentIndex: _selectedIndex,
         onTap: _onNavBarTapped,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.primaryBrand,
-        unselectedItemColor: AppColors.textTertiary,
+        selectedItemColor: Theme.of(context).primaryColor,
+        unselectedItemColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
         showUnselectedLabels: true,
         items: const [
           BottomNavigationBarItem(

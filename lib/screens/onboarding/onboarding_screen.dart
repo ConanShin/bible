@@ -4,7 +4,6 @@ import '../main_app.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
-import '../../theme/app_colors.dart';
 import '../../theme/spacing.dart';
 import 'step_1_welcome.dart';
 import 'step_2_bible_selection.dart';
@@ -103,8 +102,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       height: 8,
                       decoration: BoxDecoration(
                         color: _currentPage == index
-                            ? AppColors.primaryBrand
-                            : AppColors.primaryBrand.withOpacity(0.2),
+                            ? Theme.of(context).primaryColor
+                            : Theme.of(context).primaryColor.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     );

@@ -53,9 +53,10 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
         children.add(
           TextSpan(
             text: match.group(0),
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Colors.blue, // Highlight color
+              color: Theme.of(context).primaryColor, 
+              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.15),
             ),
           ),
         );
@@ -142,6 +143,8 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Column(
         children: [
@@ -149,8 +152,10 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: _searchController,
+              style: Theme.of(context).textTheme.bodyLarge,
               decoration: InputDecoration(
                 hintText: '검색어를 입력하세요 (예: 하나님 사랑)',
+                hintStyle: TextStyle(color: Theme.of(context).hintColor),
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.clear),
@@ -171,10 +176,13 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
           Expanded(
             child: _hasSearched
                 ? _searchResults.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
                           '검색 결과가 없습니다.',
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                          style: TextStyle(
+                            fontSize: 16, 
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                          ),
                         ),
                       )
                     : ListView.builder(
@@ -188,10 +196,11 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
                               horizontal: 16,
                               vertical: 4,
                             ),
+                            color: Theme.of(context).cardColor,
                             child: ListTile(
                               title: Text(
                                 '${verse.bookName} ${verse.chapterNumber}:${verse.verseNumber}',
-                                style: const TextStyle(
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
                                 ),
@@ -200,9 +209,8 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
                                 padding: const EdgeInsets.only(top: 4.0),
                                 child: RichText(
                                   text: TextSpan(
-                                    style: DefaultTextStyle.of(context).style.copyWith(
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                       fontSize: fontSize,
-                                      color: Colors.black87,
                                       height: 1.5,
                                     ),
                                     children: _buildHighlightedText(
@@ -219,15 +227,21 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
                           );
                         },
                       )
-                : const Center(
+                : Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.search, size: 64, color: Colors.grey),
-                        SizedBox(height: 16),
+                        Icon(
+                          Icons.search, 
+                          size: 64, 
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)
+                        ),
+                        const SizedBox(height: 16),
                         Text(
                           '성경 구절을 검색해보세요',
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                          ),
                         ),
                       ],
                     ),

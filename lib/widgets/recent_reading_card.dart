@@ -13,9 +13,15 @@ class RecentReadingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isOldTestament = item.book.testament == 'old';
-    final testamentColor = isOldTestament
-        ? AppColors.oldTestament
-        : AppColors.newTestament;
+
+    // Use lighter colors for Dark Mode visibility
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
+    final displayColor = isDarkMode
+        ? (isOldTestament 
+            ? const Color(0xFF9FA8DA) // Indigo 200 for Dark Mode
+            : const Color(0xFFBCAAA4)) // Brown 200 for Dark Mode
+        : (isOldTestament ? AppColors.oldTestament : AppColors.newTestament);
 
     return InkWell(
       onTap: () {
@@ -40,14 +46,16 @@ class RecentReadingCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFF3F4F6)),
+          border: Border.all(
+            color: Theme.of(context).dividerColor,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+              color: Theme.of(context).shadowColor.withOpacity(0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -57,10 +65,10 @@ class RecentReadingCard extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: testamentColor.withOpacity(0.1),
+                color: displayColor.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(Icons.book_outlined, color: testamentColor, size: 20),
+              child: Icon(Icons.book_outlined, color: displayColor, size: 20),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -69,15 +77,15 @@ class RecentReadingCard extends StatelessWidget {
                 children: [
                   Text(
                     item.book.name,
-                    style: AppTextStyles.bodyLarge.copyWith(
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     '${item.chapterNumber}장 ${item.verseNumber}절 읽음',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textTertiary,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
                 ],
@@ -86,7 +94,7 @@ class RecentReadingCard extends StatelessWidget {
             Icon(
               Icons.arrow_forward_ios,
               size: 14,
-              color: AppColors.textTertiary.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
             ),
           ],
         ),

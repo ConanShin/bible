@@ -1,34 +1,52 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Primary Colors
-  static const Color primaryBrand = Color(0xFF2C6E7F);
-  static const Color primaryLight = Color(0xFF4A9FB4);
-  static const Color primaryDark = Color(0xFF1D4F5F);
+  // --- Base Palette (Raw Values) ---
+  // Earth/Rose Palette
+  static const Color _cream = Color(0xFFFFF8EA);
+  static const Color _creamDarker = Color(0xFFF2EAD3);
+  static const Color _roseMuted = Color(0xFF9E7676);
+  static const Color _roseEarthy = Color(0xFF815B5B);
+  static const Color _espresso = Color(0xFF594545);
+  static const Color _roseLight = Color(0xFFD6BCBC);
+  static const Color _roseTertiary = Color(0xFFA68E8E);
 
-  // Testament Colors
-  static const Color oldTestament = Color(0xFF1A237E); // Dark Navy
-  static const Color newTestament = Color(0xFF5D4037); // Dark Brown
+  // Deep Navy Palette (Dark Mode)
+  static const Color _navyDeepest = Color(0xFF0B0F19);
+  static const Color _navySurface = Color(0xFF161C2C);
+  static const Color _navyVariant = Color(0xFF1F293D);
+  static const Color _softWhite = Color(0xFFE6EDF3);
+  static const Color _mutedGrey = Color(0xFF8B949E);
 
-  // Background & Surface
-  static const Color background = Color(0xFFF8F9FA);
-  static const Color surface = Color(0xFFFFFFFF);
-  static const Color overlay = Color(0x66000000); // 40% opacity
+  // --- Light Theme Tokens ---
+  static const Color lightPrimary = _roseMuted;
+  static const Color lightPrimaryLight = _roseLight;
+  static const Color lightPrimaryDark = _roseEarthy;
+  static const Color lightBackground = _cream;
+  static const Color lightSurface = _creamDarker;
+  static const Color lightSurfaceVariant = _roseEarthy;
+  static const Color lightTextPrimary = _espresso;
+  static const Color lightTextSecondary = _roseEarthy;
+  static const Color lightTextTertiary = _roseTertiary;
 
-  // Text Colors
-  static const Color textPrimary = Color(0xFF1F2937);
-  static const Color textSecondary = Color(0xFF6B7280);
-  static const Color textTertiary = Color(0xFF9CA3AF);
+  // --- Dark Theme Tokens ---
+  static const Color darkPrimary = _roseLight;
+  static const Color darkPrimaryLight = _roseTertiary;
+  static const Color darkBackground = _navyDeepest;
+  static const Color darkSurface = _navySurface;
+  static const Color darkSurfaceVariant = _navyVariant;
+  static const Color darkTextPrimary = _softWhite;
+  static const Color darkTextSecondary = _mutedGrey;
 
-  // Functional Colors
+  // --- Testament Colors ---
+  static const Color oldTestament = Color(0xFF08164B); 
+  static const Color newTestament = Color(0xFF3B1C07); 
+
+  // --- Functional & Universal ---
   static const Color success = Color(0xFF10B981);
   static const Color warning = Color(0xFFF59E0B);
   static const Color error = Color(0xFFEF4444);
   static const Color info = Color(0xFF3B82F6);
-
-  // Dark Mode Colors
-  static const Color darkBackground = Color(0xFF1F2937);
-  static const Color darkSurface = Color(0xFF111827);
-  static const Color darkTextPrimary = Color(0xFFF3F4F6);
-  static const Color darkTextSecondary = Color(0xFFD1D5DB);
+  static const Color secondaryAccent = Color(0xFFD4A373);
+  static const Color overlay = Color(0x66000000); 
 }

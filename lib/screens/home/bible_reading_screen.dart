@@ -110,7 +110,7 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                   Text(
                     verse.text,
                     style: AppTextStyles.bodyNormal.copyWith(
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                     ),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
@@ -160,7 +160,7 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryBrand,
+                            backgroundColor: Theme.of(context).primaryColor,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
@@ -210,8 +210,12 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
         ? AppColors.oldTestament
         : AppColors.newTestament;
 
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode 
+          ? Theme.of(context).scaffoldBackgroundColor 
+          : Theme.of(context).cardColor, // Paper color for light mode
       appBar: AppBar(
         automaticallyImplyLeading: false,
         leading: null,
@@ -242,12 +246,12 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                   key: _verseKeys[verse.verseNumber],
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 12, // Increased padding for better touch target
+                    vertical: 12,
                   ),
                   decoration: BoxDecoration(
                     color:
                         isTarget
-                            ? AppColors.primaryBrand.withOpacity(0.1)
+                            ? Theme.of(context).primaryColor.withOpacity(0.1)
                             : (isBookmarked
                                 ? Colors.yellow.withOpacity(0.1)
                                 : null),
@@ -261,18 +265,18 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                           children: [
                             Text(
                               '${verse.verseNumber}',
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.primaryBrand,
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(context).primaryColor,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             if (isBookmarked)
-                              const Padding(
-                                padding: EdgeInsets.only(top: 4.0),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4.0),
                                 child: Icon(
                                   Icons.bookmark,
                                   size: 12,
-                                  color: AppColors.primaryBrand,
+                                  color: Theme.of(context).primaryColor,
                                 ),
                               ),
                           ],
@@ -281,16 +285,14 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                       Expanded(
                         child: Text(
                           verse.text,
-                          style: AppTextStyles.bodyNormal.copyWith(
-                            fontSize:
-                                userProvider.preferences.fontSize,
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontSize: userProvider.preferences.fontSize,
                             height: 1.6,
-                            color: AppColors.textPrimary,
                             decoration:
                                 isBookmarked
                                     ? TextDecoration.underline
                                     : null,
-                            decorationColor: AppColors.primaryBrand
+                            decorationColor: Theme.of(context).primaryColor
                                 .withOpacity(0.3),
                             decorationStyle: TextDecorationStyle.dashed,
                           ),
@@ -300,7 +302,7 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                   ),
                 ),
               );
-            }).toList(),
+            }),
 
             // Next Chapter Button
             if (nextBook != null && nextChapter != null)
@@ -312,10 +314,12 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                   child: ElevatedButton(
                     onPressed: () => _navigateToNext(nextBook!, nextChapter!),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.surface,
-                      foregroundColor: AppColors.primaryBrand,
+                      backgroundColor: Theme.of(context).cardColor,
+                      foregroundColor: Theme.of(context).primaryColor,
                       elevation: 0,
-                      side: const BorderSide(color: Color(0xFFE5E7EB)),
+                      side: BorderSide(
+                        color: Theme.of(context).dividerColor.withOpacity(0.5),
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -327,9 +331,9 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                           nextBook.id == widget.book.id
                               ? '다음 장 (${nextChapter.chapterNumber}장)'
                               : '다음 책 (${nextBook.name} 1장)',
-                          style: AppTextStyles.bodyLarge.copyWith(
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: AppColors.primaryBrand,
+                            color: Theme.of(context).primaryColor,
                           ),
                         ),
                         const SizedBox(width: 8),
