@@ -28,7 +28,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final preferences = userProvider.preferences;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('설정'), elevation: 0),
       body: ListView(
         children: [
           _buildSectionTitle('읽기 설정'),

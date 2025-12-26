@@ -18,17 +18,6 @@ class BookmarksScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB), // Very light grey for background depth
-      appBar: AppBar(
-        title: const Text(
-          '북마크',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        elevation: 0,
-        scrolledUnderElevation: 2,
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.textPrimary,
-        centerTitle: false,
-      ),
       body: bookmarks.isEmpty
           ? Center(
               child: Column(

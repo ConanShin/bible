@@ -143,9 +143,6 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('검색'),
-      ),
       body: Column(
         children: [
           Padding(
