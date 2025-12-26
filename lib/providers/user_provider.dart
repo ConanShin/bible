@@ -129,6 +129,18 @@ class UserProvider with ChangeNotifier {
   List<ReadingHistoryItem> _readingHistory = [];
   List<ReadingHistoryItem> get readingHistory => _readingHistory;
 
+  Future<void> resetApp() async {
+    await _storage.clearAllData();
+    
+    // Reset in-memory state
+    _hasCompletedOnboarding = false;
+    _preferences = UserPreferences(); // Back to default
+    _bookmarks = [];
+    _readingHistory = [];
+    
+    notifyListeners();
+  }
+
   void addToHistory(BibleBook book, int chapterNumber, int verseNumber) async {
     // Remove if already exists with same content to avoid duplicates and move to top
     _readingHistory.removeWhere(

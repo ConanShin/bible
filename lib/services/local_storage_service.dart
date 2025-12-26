@@ -287,4 +287,17 @@ class LocalStorageService {
     final db = await database;
     await db.delete(ReadingHistoryTable.tableName);
   }
+
+  Future<void> clearAllData() async {
+    final db = await database;
+    await db.transaction((txn) async {
+      await txn.delete(BibleDataTable.tableName);
+      await txn.delete(BibleMetadataTable.tableName);
+      await txn.delete(ReadingHistoryTable.tableName);
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    _logger.i('All local data and preferences cleared.');
+  }
 }

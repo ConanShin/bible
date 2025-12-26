@@ -8,6 +8,8 @@ import '../../theme/app_text_styles.dart';
 import '../../widgets/download_progress_dialog.dart';
 import 'package:logger/logger.dart';
 
+import '../onboarding/onboarding_screen.dart';
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -168,9 +170,65 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ).showSnackBar(const SnackBar(content: Text('피드백 기능 준비 중입니다.')));
             },
           ),
+
+          const Divider(),
+          
+          ListTile(
+            title: Text(
+              '앱 초기화',
+              style: AppTextStyles.bodyNormal.copyWith(
+                color: AppColors.error
+              ),
+            ),
+            subtitle: const Text('모든 데이터가 삭제되고 초기 상태로 돌아갑니다.'),
+            onTap: () => _showResetConfirmation(context),
+          ),
+          
+          const SizedBox(height: 32),
         ],
       ),
     );
+  }
+
+  Future<void> _showResetConfirmation(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('앱 초기화'),
+        content: const Text(
+          '정말 초기화하시겠습니까?\n\n'
+          '다운로드한 성경, 즐겨찾기, 읽기 기록 등\n'
+          '모든 데이터가 영구적으로 삭제됩니다.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('초기화'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      final userProvider = context.read<UserProvider>();
+      await userProvider.resetApp();
+      
+      if (context.mounted) {
+        // Navigate to Onboarding and remove all previous routes
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+          (route) => false,
+        );
+      }
+    }
   }
 
   Widget _buildSectionTitle(String title) {

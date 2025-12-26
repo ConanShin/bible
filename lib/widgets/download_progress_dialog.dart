@@ -85,7 +85,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
         setState(() {
           _isDownloading = false;
           if (e is DioException && e.type == DioExceptionType.cancel) {
-            _errorMessage = 'Download cancelled';
+            _errorMessage = '다운로드가 취소되었습니다';
           } else {
             _errorMessage = e.toString();
           }
@@ -98,7 +98,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
-        _errorMessage == null ? 'Downloading Bible Data' : 'Download Failed',
+        _errorMessage == null ? '성경 데이터 다운로드 중' : '다운로드 실패',
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -125,7 +125,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Downloads are required for offline access.',
+              '오프라인 성경 사용을 위해 다운로드가 필요합니다.',
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
@@ -142,7 +142,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
               });
               _startDownload();
             },
-            child: const Text('Retry'),
+            child: const Text('재시도'),
           ),
 
         TextButton(
@@ -155,7 +155,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
             }
           },
           child: Text(
-            _errorMessage == null && !_isDownloading ? 'Close' : 'Cancel',
+            _errorMessage == null && !_isDownloading ? '닫기' : '취소',
           ),
         ),
       ],

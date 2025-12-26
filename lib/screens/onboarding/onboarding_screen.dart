@@ -1,4 +1,5 @@
 import '../../widgets/download_progress_dialog.dart';
+import '../main_app.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -48,8 +49,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     if (success == true && mounted) {
       await userProvider.completeOnboarding();
-      // Navigator push handled by main app or provider listener usually,
-      // but completing onboarding triggers main to rebuild.
+      
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const MainApp()),
+          (route) => false,
+        );
+      }
     } else {
       // Handle failure or cancellation?
       // For now, if cancelled, stay on onboarding.
