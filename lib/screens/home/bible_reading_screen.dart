@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../models/bible_book.dart';
 import '../../models/bible_chapter.dart';
 import '../../providers/bible_provider.dart';
+import '../../providers/user_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 
@@ -151,6 +152,10 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                       child: Text(
                         verse.text,
                         style: AppTextStyles.bodyNormal.copyWith(
+                          fontSize: context
+                              .watch<UserProvider>()
+                              .preferences
+                              .fontSize,
                           height: 1.6,
                           color: AppColors.textPrimary,
                         ),

@@ -26,31 +26,63 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final preferences = userProvider.preferences;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('설정'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('설정'), elevation: 0),
       body: ListView(
         children: [
           _buildSectionTitle('읽기 설정'),
-          
+
           // Font Size
           ListTile(
             title: const Text('글자 크기'),
-            subtitle: Row(
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.text_fields, size: 16),
-                Expanded(
-                  child: Slider(
-                    value: preferences.fontSize,
-                    min: 12,
-                    max: 30,
-                    onChanged: (value) {
-                      userProvider.savePreference('fontSize', value);
-                    },
+                Row(
+                  children: [
+                    const Icon(Icons.text_fields, size: 16),
+                    Expanded(
+                      child: Slider(
+                        value: preferences.fontSize,
+                        min: 12,
+                        max: 30,
+                        onChanged: (value) {
+                          userProvider.savePreference('fontSize', value);
+                        },
+                      ),
+                    ),
+                    const Icon(Icons.text_fields, size: 24),
+                  ],
+                ),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '창세기 1:1',
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.primaryBrand,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '태초에 하나님이 천지를 창조하시니라',
+                        style: AppTextStyles.bodyNormal.copyWith(
+                          fontSize: preferences.fontSize,
+                          height: 1.5,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const Icon(Icons.text_fields, size: 24),
+                const SizedBox(height: 8),
               ],
             ),
           ),
@@ -68,9 +100,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // Bible Version Selector
           ListTile(
             title: const Text('성경 버전'),
-            subtitle: Text(preferences.selectedBibleVersion == 'krv' ? '개역개정' : 
-                           preferences.selectedBibleVersion == 'knv' ? '새번역' :
-                           preferences.selectedBibleVersion == 'easy' ? '쉬운성경' : '개역한글'),
+            subtitle: Text(
+              preferences.selectedBibleVersion == 'krv'
+                  ? '개역개정'
+                  : preferences.selectedBibleVersion == 'knv'
+                  ? '새번역'
+                  : preferences.selectedBibleVersion == 'easy'
+                  ? '쉬운성경'
+                  : '개역한글',
+            ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showBibleVersionSelector(context),
           ),
@@ -84,9 +122,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: const Text('한국어'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('다국어 지원 준비 중입니다.')),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('다국어 지원 준비 중입니다.')));
             },
           ),
 
@@ -110,8 +148,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 );
                 if (picked != null) {
                   userProvider.savePreference(
-                    'dailyNotificationTime', 
-                    '${picked.hour}:${picked.minute}'
+                    'dailyNotificationTime',
+                    '${picked.hour}:${picked.minute}',
                   );
                 }
               },
@@ -120,17 +158,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const Divider(),
           _buildSectionTitle('기타'),
 
-          ListTile(
-            title: const Text('앱 버전'),
-            trailing: const Text('1.0.0'),
-          ),
+          ListTile(title: const Text('앱 버전'), trailing: const Text('1.0.0')),
 
           ListTile(
             title: const Text('피드백 보내기'),
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('피드백 기능 준비 중입니다.')),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('피드백 기능 준비 중입니다.')));
             },
           ),
         ],
@@ -172,7 +207,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: versions.map((v) {
               return ListTile(
                 title: Text(v['name']!),
-                trailing: currentVersion == v['id'] ? const Icon(Icons.check, color: AppColors.primaryBrand) : null,
+                trailing: currentVersion == v['id']
+                    ? const Icon(Icons.check, color: AppColors.primaryBrand)
+                    : null,
                 onTap: () => Navigator.pop(context, v['id']),
               );
             }).toList(),
@@ -191,7 +228,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('성경 버전 변경'),
-        content: Text('${newVersion == 'krv' ? '개역개정' : newVersion == 'knv' ? '새번역' : newVersion == 'easy' ? '쉬운성경' : '개역한글'} 버전을 다운로드하시겠습니까?\n네트워크 연결이 필요합니다.'),
+        content: Text(
+          '${newVersion == 'krv'
+              ? '개역개정'
+              : newVersion == 'knv'
+              ? '새번역'
+              : newVersion == 'easy'
+              ? '쉬운성경'
+              : '개역한글'} 버전을 다운로드하시겠습니까?\n네트워크 연결이 필요합니다.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -207,7 +252,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (confirmed == true) {
       if (!mounted) return;
-      
+
       final success = await showDialog<bool>(
         context: context,
         barrierDismissible: false,
@@ -218,12 +263,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         if (!mounted) return;
         final userProvider = context.read<UserProvider>();
         final bibleProvider = context.read<BibleProvider>();
-        
+
         await userProvider.updateBibleVersion(newVersion);
         await bibleProvider.loadBibleData(version: newVersion);
-        
+
         if (mounted) {
-           ScaffoldMessenger.of(context).showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('성경 버전이 성공적으로 변경되었습니다.')),
           );
         }
