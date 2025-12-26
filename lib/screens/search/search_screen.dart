@@ -1,13 +1,243 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../models/bible_verse.dart';
+import '../../providers/bible_provider.dart';
+import '../../providers/user_provider.dart';
+import '../home/bible_reading_screen.dart';
 
-class SearchScreen extends StatelessWidget {
+class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
   @override
+  State<SearchScreen> createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClientMixin {
+  final TextEditingController _searchController = TextEditingController();
+  List<BibleVerse> _searchResults = [];
+  bool _hasSearched = false;
+
+  List<InlineSpan> _buildHighlightedText(String text, String query) {
+    if (query.trim().isEmpty) return [TextSpan(text: text)];
+
+    final terms = query.trim().toLowerCase().split(RegExp(r'\s+'));
+    final children = <InlineSpan>[];
+    final lowerText = text.toLowerCase();
+    int currentIndex = 0;
+
+    // Use a simple approach: Find the first occurrence of any term, highlight it, then continue.
+    // However, for multiple terms, they might overlap or be out of order.
+    // A robust way is to find all ranges of all terms and merge overlapping ones.
+    // For simplicity given the requirement, let's just highlight exact matches of terms.
+    
+    // Actually, splitting by regex keeping delimiters might be easier if we only had one term.
+    // With multiple terms, let's use a simpler heuristic:
+    // Split text by space, check each word if it contains any of the search terms.
+    
+    // Better approach:
+    // 1. Create a simplified version of text for matching (lowercase).
+    // 2. Iterate through the text character by character or word by word?
+    // Let's stick to a basic logic: Regex replace? No, Custom parser.
+    
+    // Let's try matching all terms.
+    // Create a regular expression from terms
+    final sortedTerms = terms.toList()..sort((a, b) => b.length.compareTo(a.length)); // match longer terms first
+    final pattern = RegExp(
+      sortedTerms.map((t) => RegExp.escape(t)).join('|'),
+      caseSensitive: false,
+    );
+
+    text.splitMapJoin(
+      pattern,
+      onMatch: (Match match) {
+        children.add(
+          TextSpan(
+            text: match.group(0),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.blue, // Highlight color
+            ),
+          ),
+        );
+        return '';
+      },
+      onNonMatch: (String nonMatch) {
+        children.add(TextSpan(text: nonMatch));
+        return '';
+      },
+    );
+
+    return children;
+  }
+
+  void _openChapter(BuildContext context, BibleVerse verse) {
+    // 1. Find BibleBook object
+    final bibleProvider = Provider.of<BibleProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    try {
+      final book = bibleProvider.books.firstWhere(
+        (b) => b.name == verse.bookName,
+      );
+
+      // 2. Add to History
+      userProvider.addToHistory(
+        book,
+        verse.chapterNumber,
+        verse.verseNumber,
+      );
+
+      // 3. Show Reader Screen
+      // Find the specific chapter object
+      final chapter = book.chapters.firstWhere(
+        (c) => c.chapterNumber == verse.chapterNumber,
+        orElse: () => book.chapters.first,
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BibleReadingScreen(
+            book: book,
+            chapter: chapter,
+            initialVerse: verse.verseNumber,
+          ),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('성경 데이터를 불러오는 중 오류가 발생했습니다.')),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _performSearch() {
+    final query = _searchController.text;
+    if (query.trim().isEmpty) {
+      setState(() {
+        _searchResults = [];
+        _hasSearched = false;
+      });
+      return;
+    }
+
+    final provider = Provider.of<BibleProvider>(context, listen: false);
+    final results = provider.searchVerses(query);
+
+    setState(() {
+      _searchResults = results;
+      _hasSearched = true;
+    });
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('검색')), // Search
-      body: const Center(child: Text('검색 화면 준비 중')),
+      appBar: AppBar(
+        title: const Text('검색'),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: '검색어를 입력하세요 (예: 하나님 사랑)',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    _performSearch();
+                  },
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => _performSearch(),
+            ),
+          ),
+          Expanded(
+            child: _hasSearched
+                ? _searchResults.isEmpty
+                    ? const Center(
+                        child: Text(
+                          '검색 결과가 없습니다.',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: _searchResults.length,
+                        itemBuilder: (context, index) {
+                          final verse = _searchResults[index];
+                          final fontSize = context.watch<UserProvider>().preferences.fontSize;
+                          
+                          return Card(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            child: ListTile(
+                              title: Text(
+                                '${verse.bookName} ${verse.chapterNumber}:${verse.verseNumber}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 4.0),
+                                child: RichText(
+                                  text: TextSpan(
+                                    style: DefaultTextStyle.of(context).style.copyWith(
+                                      fontSize: fontSize,
+                                      color: Colors.black87,
+                                      height: 1.5,
+                                    ),
+                                    children: _buildHighlightedText(
+                                      verse.text,
+                                      _searchController.text,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              onTap: () {
+                                _openChapter(context, verse);
+                              },
+                            ),
+                          );
+                        },
+                      )
+                : const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.search, size: 64, color: Colors.grey),
+                        SizedBox(height: 16),
+                        Text(
+                          '성경 구절을 검색해보세요',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

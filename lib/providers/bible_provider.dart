@@ -69,4 +69,19 @@ class BibleProvider with ChangeNotifier {
 
     return allVerses[dayOfYear % allVerses.length];
   }
+
+  List<BibleVerse> searchVerses(String query) {
+    if (query.trim().isEmpty) {
+      return [];
+    }
+
+    final terms = query.trim().toLowerCase().split(RegExp(r'\s+'));
+    final allVerses = getAllVerses();
+
+    return allVerses.where((verse) {
+      final text = verse.text.toLowerCase();
+      // All terms must be present in the verse text
+      return terms.every((term) => text.contains(term));
+    }).toList();
+  }
 }
