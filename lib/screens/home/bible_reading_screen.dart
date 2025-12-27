@@ -7,7 +7,6 @@ import '../../services/ad_service.dart';
 import '../../providers/bible_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../models/bible_verse.dart';
-import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 
 class BibleReadingScreen extends StatefulWidget {
@@ -266,11 +265,7 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
       }
     }
 
-    final isOldTestament = currentBook.testament == 'old';
-    final testamentColor = isOldTestament
-        ? AppColors.oldTestament
-        : AppColors.newTestament;
-
+    // Colors determined by theme mode
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -280,17 +275,30 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         leading: null,
-        title: Text('${currentBook.name} ${currentChapter.chapterNumber}장'),
+        title: Text(
+          '${currentBook.name} ${currentChapter.chapterNumber}장',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.close, size: 22),
+            icon: Icon(
+              Icons.close,
+              size: 22,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
           const SizedBox(width: 8),
         ],
-        elevation: 1,
-        backgroundColor: testamentColor,
-        foregroundColor: Colors.white,
+        elevation: 0,
+        backgroundColor: isDarkMode
+            ? Theme.of(context).scaffoldBackgroundColor
+            : Theme.of(context).cardColor,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
       ),
       body: SingleChildScrollView(
         child: Column(

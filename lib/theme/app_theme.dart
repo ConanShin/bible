@@ -73,6 +73,39 @@ class AppTheme {
           ),
         ),
       ),
+      sliderTheme: SliderThemeData(
+        activeTrackColor: AppColors.lightTextPrimary,
+        inactiveTrackColor: AppColors.lightTextPrimary.withOpacity(0.1),
+        thumbColor: AppColors.lightTextPrimary,
+        overlayColor: AppColors.lightTextPrimary.withOpacity(0.12),
+        valueIndicatorColor: AppColors.lightTextPrimary,
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: MaterialStateProperty.resolveWith(
+          (states) => states.contains(MaterialState.selected)
+              ? AppColors.lightTextPrimary
+              : null,
+        ),
+        trackColor: MaterialStateProperty.resolveWith(
+          (states) => states.contains(MaterialState.selected)
+              ? AppColors.lightTextPrimary.withOpacity(0.5)
+              : null,
+        ),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: MaterialStateProperty.resolveWith(
+          (states) => states.contains(MaterialState.selected)
+              ? AppColors.lightTextPrimary
+              : null,
+        ),
+      ),
+      radioTheme: RadioThemeData(
+        fillColor: MaterialStateProperty.resolveWith(
+          (states) => states.contains(MaterialState.selected)
+              ? AppColors.lightTextPrimary
+              : null,
+        ),
+      ),
     );
   }
 

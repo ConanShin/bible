@@ -52,9 +52,7 @@ class _MainAppState extends State<MainApp> {
       appBar: AppBar(
         title: const Text(
           '심플 성경',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ), // Using default or style from theme
+          style: TextStyle(fontWeight: FontWeight.w100),
         ),
         elevation: 1,
         // backgroundColor: Colors.white, // Removed to support dark mode

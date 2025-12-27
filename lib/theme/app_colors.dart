@@ -3,15 +3,6 @@ import 'package:flutter/material.dart';
 class AppColors {
   // --- Base Palette (Raw Values) ---
   // Earth/Rose Palette
-  static const Color _cream = Color(0xFFFFF8EA);
-  static const Color _creamDarker = Color(0xFFF2EAD3);
-  static const Color _roseMuted = Color(0xFF9E7676);
-  static const Color _roseEarthy = Color(0xFF815B5B);
-  static const Color _espresso = Color(0xFF594545);
-  static const Color _roseLight = Color(0xFFD6BCBC);
-  static const Color _roseTertiary = Color(0xFFA68E8E);
-
-  // Deep Navy Palette (Dark Mode)
   static const Color _navyDeepest = Color(0xFF0B0F19);
   static const Color _navySurface = Color(0xFF161C2C);
   static const Color _navyVariant = Color(0xFF1F293D);
@@ -19,20 +10,22 @@ class AppColors {
   static const Color _mutedGrey = Color(0xFF8B949E);
 
   // --- Light Theme Tokens ---
-  static const Color lightPrimary = _roseMuted;
-  static const Color lightPrimaryLight = _roseLight;
-  static const Color lightPrimaryDark = _roseEarthy;
-  static const Color lightBackground = _cream;
-  static const Color lightSurface = _creamDarker;
-  static const Color lightSurfaceVariant = _roseEarthy;
-  static const Color lightTextPrimary = _espresso;
-  static const Color lightTextSecondary = _roseEarthy;
-  static const Color lightTextTertiary = _roseTertiary;
+  static const Color lightPrimary = Color(0xFF333333); // Neutral Dark Grey
+  static const Color lightPrimaryLight = Color(0xFF666666);
+  static const Color lightPrimaryDark = Color(0xFF000000);
+  static const Color lightBackground = Color(
+    0xFFF8F8F8,
+  ); // Very Light Neutral Grey (No Blue tint)
+  static const Color lightSurface = Colors.white;
+  static const Color lightSurfaceVariant = Color(0xFFEEEEEE);
+  static const Color lightTextPrimary = Color(0xFF1A1A1A); // Almost Black
+  static const Color lightTextSecondary = Color(0xFF4D4D4D);
+  static const Color lightTextTertiary = Color(0xFF808080);
 
   // --- Dark Theme Tokens ---
   // static const Color darkPrimary = _espresso;
   static const Color darkPrimary = Color.fromARGB(255, 130, 149, 214);
-  static const Color darkPrimaryLight = _roseTertiary;
+  static const Color darkPrimaryLight = _navyVariant;
   static const Color darkBackground = _navyDeepest;
   static const Color darkSurface = _navySurface;
   static const Color darkSurfaceVariant = _navyVariant;
