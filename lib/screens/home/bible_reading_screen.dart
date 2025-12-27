@@ -158,16 +158,48 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                   if (isBookmarked)
                     Expanded(
                       child: TextButton(
-                        onPressed: () {
-                          userProvider.removeBookmark(verse);
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('북마크가 삭제되었습니다.')),
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('북마크 삭제'),
+                              content: const Text('이 북마크를 삭제하시겠습니까?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
+                                  child: const Text('취소'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.error,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                  child: const Text('삭제'),
+                                ),
+                              ],
+                            ),
                           );
+
+                          if (confirm == true) {
+                            userProvider.removeBookmark(verse);
+                            if (context.mounted) {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('북마크가 삭제되었습니다.')),
+                              );
+                            }
+                          }
                         },
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.red,
                           padding: const EdgeInsets.symmetric(vertical: 16),
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         child: const Text('삭제'),
                       ),
@@ -188,7 +220,6 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).primaryColor,
-                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

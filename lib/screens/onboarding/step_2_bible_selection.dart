@@ -155,7 +155,6 @@ class Step2BibleSelection extends StatelessWidget {
                     onPressed: onNext,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusMd,

@@ -181,7 +181,6 @@ class Step3Settings extends StatelessWidget {
                     onPressed: onComplete,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusMd,

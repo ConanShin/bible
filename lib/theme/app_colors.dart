@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // --- Base Palette (Raw Values) ---
-  // Earth/Rose Palette
-  static const Color _navyDeepest = Color(0xFF0B0F19);
-  static const Color _navySurface = Color(0xFF161C2C);
-  static const Color _navyVariant = Color(0xFF1F293D);
-  static const Color _softWhite = Color(0xFFE6EDF3);
-  static const Color _mutedGrey = Color(0xFF8B949E);
+  static const Color _darkDeepest = Color(0xFF121212);
+  static const Color _darkSurface = Color(0xFF1E1E1E);
+  static const Color _darkVariant = Color(0xFF2C2C2C);
+  static const Color _neutralWhite = Color(0xFFE0E0E0);
+  static const Color _neutralGrey = Color(0xFF9E9E9E);
 
   // --- Light Theme Tokens ---
   static const Color lightPrimary = Color(0xFF333333); // Neutral Dark Grey
@@ -23,14 +22,13 @@ class AppColors {
   static const Color lightTextTertiary = Color(0xFF808080);
 
   // --- Dark Theme Tokens ---
-  // static const Color darkPrimary = _espresso;
-  static const Color darkPrimary = Color.fromARGB(255, 130, 149, 214);
-  static const Color darkPrimaryLight = _navyVariant;
-  static const Color darkBackground = _navyDeepest;
-  static const Color darkSurface = _navySurface;
-  static const Color darkSurfaceVariant = _navyVariant;
-  static const Color darkTextPrimary = _softWhite;
-  static const Color darkTextSecondary = _mutedGrey;
+  static const Color darkPrimary = Color(0xFFCCCCCC); // Neutral Light Grey
+  static const Color darkPrimaryLight = Color(0xFF999999);
+  static const Color darkBackground = _darkDeepest;
+  static const Color darkSurface = _darkSurface;
+  static const Color darkSurfaceVariant = _darkVariant;
+  static const Color darkTextPrimary = _neutralWhite;
+  static const Color darkTextSecondary = _neutralGrey;
 
   // --- Testament Colors ---
   static const Color oldTestament = Color.fromARGB(255, 116, 125, 162);

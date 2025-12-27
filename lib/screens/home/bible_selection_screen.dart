@@ -310,6 +310,7 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen>
             Expanded(
               child: TextField(
                 controller: _searchController,
+                autofocus: true,
                 textAlignVertical: TextAlignVertical.center,
                 style: const TextStyle(fontSize: 14),
                 onChanged: (value) {

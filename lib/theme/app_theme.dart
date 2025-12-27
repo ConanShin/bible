@@ -55,8 +55,10 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.lightPrimary,
-          foregroundColor: Colors.white,
+          foregroundColor:
+              AppColors.lightBackground, // Light grey text on dark button
           elevation: 0,
+          textStyle: const TextStyle(fontWeight: FontWeight.bold),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -65,6 +67,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.lightTextPrimary,
+          textStyle: const TextStyle(fontWeight: FontWeight.bold),
           side: BorderSide(
             color: AppColors.lightSurfaceVariant.withOpacity(0.5),
           ),
@@ -124,8 +127,8 @@ class AppTheme {
         surfaceVariant: AppColors.darkSurfaceVariant,
         background: AppColors.darkBackground,
         error: AppColors.error,
-        onPrimary: Colors.white,
-        onSecondary: Colors.white,
+        onPrimary: AppColors.lightPrimary, // Dark grey text on light button
+        onSecondary: AppColors.lightPrimary,
         onSurface: AppColors.darkTextPrimary,
         onBackground: AppColors.darkTextPrimary,
         onError: Colors.white,
@@ -205,8 +208,9 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.darkPrimary,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.lightPrimary, // Dark grey text color
           elevation: 0,
+          textStyle: const TextStyle(fontWeight: FontWeight.bold),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -215,6 +219,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.darkTextPrimary,
+          textStyle: const TextStyle(fontWeight: FontWeight.bold),
           side: BorderSide(color: AppColors.darkSurfaceVariant),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

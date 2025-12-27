@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
@@ -32,7 +31,7 @@ class Step1Welcome extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.xxxl),
-          
+
           Text(
             "성경 읽기 여정을\n시작하세요",
             textAlign: TextAlign.center,
@@ -49,9 +48,9 @@ class Step1Welcome extends StatelessWidget {
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
             ),
           ),
-          
+
           const Spacer(),
-          
+
           SizedBox(
             width: double.infinity,
             height: 48,
@@ -59,17 +58,15 @@ class Step1Welcome extends StatelessWidget {
               onPressed: onNext,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).primaryColor,
-                foregroundColor: Colors.white,
+                elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 ),
-                elevation: 0,
               ),
               child: Text(
                 "다음",
                 style: AppTextStyles.bodyNormal.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
                 ),
               ),
             ),

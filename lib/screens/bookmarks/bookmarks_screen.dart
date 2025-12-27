@@ -109,6 +109,29 @@ class _BookmarkItemState extends State<_BookmarkItem> {
         padding: const EdgeInsets.only(right: 20),
         child: const Icon(Icons.delete_outline, color: Colors.white, size: 28),
       ),
+      confirmDismiss: (direction) async {
+        return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('북마크 삭제'),
+            content: const Text('이 북마크를 삭제하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('삭제'),
+              ),
+            ],
+          ),
+        );
+      },
       onDismissed: (direction) {
         context.read<UserProvider>().deleteBookmarkById(widget.bookmark.id);
         ScaffoldMessenger.of(context).showSnackBar(
