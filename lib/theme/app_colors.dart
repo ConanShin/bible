@@ -31,7 +31,7 @@ class AppColors {
 
   // --- Dark Theme Tokens ---
   // static const Color darkPrimary = _espresso;
-  static const Color darkPrimary = Color.fromARGB(255, 79, 117, 240);
+  static const Color darkPrimary = Color.fromARGB(255, 130, 149, 214);
   static const Color darkPrimaryLight = _roseTertiary;
   static const Color darkBackground = _navyDeepest;
   static const Color darkSurface = _navySurface;
