@@ -8,7 +8,16 @@ import '../../theme/app_text_styles.dart';
 import '../../widgets/download_progress_dialog.dart';
 import 'package:logger/logger.dart';
 
+import 'package:url_launcher/url_launcher.dart';
 import '../onboarding/onboarding_screen.dart';
+
+String? encodeQueryParameters(Map<String, String> params) {
+  return params.entries
+      .map(
+        (e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+      )
+      .join('&');
+}
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -186,10 +195,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           ListTile(
             title: const Text('피드백 보내기'),
-            onTap: () {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('피드백 기능 준비 중입니다.')));
+            onTap: () async {
+              final Uri emailLaunchUri = Uri(
+                scheme: 'mailto',
+                path: 'cheolmin.conan.shin@gmail.com',
+                query: encodeQueryParameters({'subject': '[성경 앱 피드백]'}),
+              );
+
+              try {
+                if (await canLaunchUrl(emailLaunchUri)) {
+                  await launchUrl(emailLaunchUri);
+                } else {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('메일 앱을 열 수 없습니다.')),
+                    );
+                  }
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('작업 중 오류가 발생했습니다.')),
+                  );
+                }
+              }
             },
           ),
 
