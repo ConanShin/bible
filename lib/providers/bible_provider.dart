@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../models/bible_book.dart';
 import '../models/bible_verse.dart';
 import '../services/bible_service.dart';
+import '../utils/hangul_utils.dart';
 
 class BibleProvider with ChangeNotifier {
   final BibleService _bibleService;
@@ -79,9 +80,9 @@ class BibleProvider with ChangeNotifier {
     final allVerses = getAllVerses();
 
     return allVerses.where((verse) {
-      final text = verse.text.toLowerCase();
-      // All terms must be present in the verse text
-      return terms.every((term) => text.contains(term));
+      final text = verse.text;
+      // All terms must be present in the verse text (literal or chosung)
+      return terms.every((term) => HangulUtils.matches(text, term));
     }).toList();
   }
 }

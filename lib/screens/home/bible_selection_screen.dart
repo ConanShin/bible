@@ -6,6 +6,7 @@ import '../../providers/bible_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
+import '../../utils/hangul_utils.dart';
 import 'bible_reading_screen.dart';
 
 class BibleSelectionScreen extends StatefulWidget {
@@ -242,9 +243,8 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen>
 
   Widget _buildBookStep(List<BibleBook> books) {
     final filteredBooks = books.where((book) {
-      final query = _searchQuery.toLowerCase();
-      return book.name.toLowerCase().contains(query) ||
-          book.englishName.toLowerCase().contains(query);
+      return HangulUtils.matches(book.name, _searchQuery) ||
+          HangulUtils.matches(book.englishName, _searchQuery);
     }).toList();
 
     final oldBooks = filteredBooks.where((b) => b.testament == 'old').toList();
@@ -321,9 +321,8 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen>
                     if (value.isNotEmpty) {
                       try {
                         final firstMatch = allBooks.firstWhere((book) {
-                          final query = value.toLowerCase();
-                          return book.name.toLowerCase().contains(query) ||
-                              book.englishName.toLowerCase().contains(query);
+                          return HangulUtils.matches(book.name, value) ||
+                              HangulUtils.matches(book.englishName, value);
                         });
 
                         final targetIndex = firstMatch.testament == 'old'
@@ -339,7 +338,7 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen>
                   });
                 },
                 decoration: InputDecoration(
-                  hintText: '성경 검색 (예: 창세, Gen)',
+                  hintText: '성경 검색 (예: 창세, ㅊㅅㄱ)',
                   hintStyle: TextStyle(
                     color: Theme.of(
                       context,
