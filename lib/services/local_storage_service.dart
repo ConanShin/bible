@@ -293,7 +293,7 @@ class LocalStorageService {
     return await db.query(
       ReadingHistoryTable.tableName,
       orderBy: '${ReadingHistoryTable.columnTimestamp} DESC',
-      limit: 20,
+      limit: 30,
     );
   }
 

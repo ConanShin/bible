@@ -184,7 +184,7 @@ class UserProvider with ChangeNotifier {
       ),
     );
 
-    if (_readingHistory.length > 20) {
+    if (_readingHistory.length > 30) {
       _readingHistory.removeLast();
     }
 

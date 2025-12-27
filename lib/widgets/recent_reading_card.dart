@@ -69,11 +69,25 @@ class RecentReadingCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    item.book.name,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        item.book.name,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        '${item.timestamp.year}.${item.timestamp.month.toString().padLeft(2, '0')}.${item.timestamp.day.toString().padLeft(2, '0')}',
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.4),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -87,6 +101,7 @@ class RecentReadingCard extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(width: 8),
             Icon(
               Icons.arrow_forward_ios,
               size: 14,
