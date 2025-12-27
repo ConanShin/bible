@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
@@ -27,12 +26,6 @@ class Step3Settings extends StatelessWidget {
           onPressed: onBack,
         ),
         title: Text("설정", style: AppTextStyles.bodyLarge),
-        actions: [
-          TextButton(
-            onPressed: onComplete,
-            child: Text("완료", style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold)),
-          ),
-        ],
       ),
       body: Consumer<UserProvider>(
         builder: (context, userProvider, _) {
@@ -41,11 +34,22 @@ class Step3Settings extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("읽기 경험 설정", style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                  "읽기 경험 설정",
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.xxxl),
-                
+
                 // Font Size Slider
-                Text("글자 크기", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(
+                  "글자 크기",
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.sm),
                 Row(
                   children: [
@@ -59,62 +63,91 @@ class Step3Settings extends StatelessWidget {
                         activeColor: Theme.of(context).primaryColor,
                         label: userProvider.preferences.fontSize.toString(),
                         onChanged: (value) {
-                           UserPreferences newPrefs = userProvider.preferences;
-                           newPrefs.fontSize = value;
-                           userProvider.updatePreferences(newPrefs);
+                          UserPreferences newPrefs = userProvider.preferences;
+                          newPrefs.fontSize = value;
+                          userProvider.updatePreferences(newPrefs);
                         },
                       ),
                     ),
-                    Text("가", style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+                    Text(
+                      "가",
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
                   ],
                 ),
-                
+
                 const SizedBox(height: AppSpacing.xxxl),
-                
+
                 // Night Mode Toggle
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("야간 모드", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(
+                      "야간 모드",
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     Switch(
                       value: userProvider.preferences.isDarkMode,
                       activeColor: Theme.of(context).primaryColor,
                       onChanged: (value) {
-                         UserPreferences newPrefs = userProvider.preferences;
-                         newPrefs.isDarkMode = value;
-                         userProvider.updatePreferences(newPrefs);
-                         // Sync theme instantly
-                         context.read<ThemeProvider>().setDarkMode(value);
+                        UserPreferences newPrefs = userProvider.preferences;
+                        newPrefs.isDarkMode = value;
+                        userProvider.updatePreferences(newPrefs);
+                        // Sync theme instantly
+                        context.read<ThemeProvider>().setDarkMode(value);
                       },
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: AppSpacing.xxxl),
-                
+
                 // Notification (Simple Toggle)
-                Text("자동 진행 (선택사항)", style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
+                Text(
+                  "자동 진행 (선택사항)",
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.sm),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                   Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
-                     children: [
-                       Text("매일 알림 받기", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16, fontWeight: FontWeight.bold)),
-                       Text(
-                         "${userProvider.preferences.dailyNotificationTime.format(context)}에 알림", 
-                         style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))
-                       ),
-                     ],
-                   ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "매일 알림 받기",
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                        Text(
+                          "${userProvider.preferences.dailyNotificationTime.format(context)}에 알림",
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.6),
+                              ),
+                        ),
+                      ],
+                    ),
                     Switch(
                       value: userProvider.preferences.isNotificationEnabled,
                       activeColor: Theme.of(context).primaryColor,
                       onChanged: (value) {
-                         UserPreferences newPrefs = userProvider.preferences;
-                         newPrefs.isNotificationEnabled = value;
-                         userProvider.updatePreferences(newPrefs);
+                        UserPreferences newPrefs = userProvider.preferences;
+                        newPrefs.isNotificationEnabled = value;
+                        userProvider.updatePreferences(newPrefs);
                       },
                     ),
                   ],
@@ -127,33 +160,36 @@ class Step3Settings extends StatelessWidget {
                       onPressed: () async {
                         final TimeOfDay? picked = await showTimePicker(
                           context: context,
-                          initialTime: userProvider.preferences.dailyNotificationTime,
+                          initialTime:
+                              userProvider.preferences.dailyNotificationTime,
                         );
                         if (picked != null) {
-                           UserPreferences newPrefs = userProvider.preferences;
-                           newPrefs.dailyNotificationTime = picked;
-                           userProvider.updatePreferences(newPrefs);
+                          UserPreferences newPrefs = userProvider.preferences;
+                          newPrefs.dailyNotificationTime = picked;
+                          userProvider.updatePreferences(newPrefs);
                         }
                       },
                     ),
                   ),
 
                 const SizedBox(height: 48),
-                
+
                 SizedBox(
-                   width: double.infinity,
-                   height: 48,
-                   child: ElevatedButton(
-                     onPressed: onComplete,
-                     style: ElevatedButton.styleFrom(
-                       backgroundColor: Theme.of(context).primaryColor,
-                       foregroundColor: Colors.white,
-                       shape: RoundedRectangleBorder(
-                         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                       ),
-                     ),
-                     child: const Text("설정 완료 & 시작"),
-                   ),
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: onComplete,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMd,
+                        ),
+                      ),
+                    ),
+                    child: const Text("설정 완료 & 시작"),
+                  ),
                 ),
               ],
             ),

@@ -30,7 +30,8 @@ class AppColors {
   static const Color lightTextTertiary = _roseTertiary;
 
   // --- Dark Theme Tokens ---
-  static const Color darkPrimary = _roseLight;
+  // static const Color darkPrimary = _espresso;
+  static const Color darkPrimary = Color.fromARGB(255, 79, 117, 240);
   static const Color darkPrimaryLight = _roseTertiary;
   static const Color darkBackground = _navyDeepest;
   static const Color darkSurface = _navySurface;
@@ -39,8 +40,8 @@ class AppColors {
   static const Color darkTextSecondary = _mutedGrey;
 
   // --- Testament Colors ---
-  static const Color oldTestament = Color(0xFF08164B); 
-  static const Color newTestament = Color(0xFF3B1C07); 
+  static const Color oldTestament = Color.fromARGB(255, 116, 125, 162);
+  static const Color newTestament = Color.fromARGB(255, 116, 102, 91);
 
   // --- Functional & Universal ---
   static const Color success = Color(0xFF10B981);
@@ -48,5 +49,5 @@ class AppColors {
   static const Color error = Color(0xFFEF4444);
   static const Color info = Color(0xFF3B82F6);
   static const Color secondaryAccent = Color(0xFFD4A373);
-  static const Color overlay = Color(0x66000000); 
+  static const Color overlay = Color(0x66000000);
 }

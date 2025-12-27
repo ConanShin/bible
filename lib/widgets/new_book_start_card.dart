@@ -36,8 +36,8 @@ class NewBookStartCard extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: Theme.of(context).dividerColor.withOpacity(0.2), 
-            width: 1.5
+            color: Theme.of(context).dividerColor.withOpacity(0.2),
+            width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
@@ -69,7 +69,7 @@ class NewBookStartCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "새로운 도서 시작",
+                    "성경 선택",
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -77,7 +77,9 @@ class NewBookStartCard extends StatelessWidget {
                   Text(
                     "은혜로운 첫 장을 열어보세요",
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
                 ],

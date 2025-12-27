@@ -26,17 +26,6 @@ class Step2BibleSelection extends StatelessWidget {
           onPressed: onBack,
         ),
         title: Text("성경 선택", style: AppTextStyles.bodyLarge),
-        actions: [
-          TextButton(
-            onPressed: onNext,
-            child: Text(
-              "건너뛰기",
-              style: AppTextStyles.bodySmall.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-              ),
-            ),
-          ),
-        ],
       ),
       body: Consumer<BibleProvider>(
         builder: (context, bibleProvider, child) {

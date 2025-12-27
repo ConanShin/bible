@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_text_styles.dart';
@@ -47,7 +46,10 @@ class AppTheme {
         shadowColor: AppColors.lightTextPrimary.withOpacity(0.08),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: AppColors.lightSurfaceVariant.withOpacity(0.12), width: 1),
+          side: BorderSide(
+            color: AppColors.lightSurfaceVariant.withOpacity(0.12),
+            width: 1,
+          ),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -63,7 +65,9 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.lightTextPrimary,
-          side: BorderSide(color: AppColors.lightSurfaceVariant.withOpacity(0.5)),
+          side: BorderSide(
+            color: AppColors.lightSurfaceVariant.withOpacity(0.5),
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -94,13 +98,27 @@ class AppTheme {
         onError: Colors.white,
       ),
       textTheme: TextTheme(
-        displayLarge: AppTextStyles.heading1.copyWith(color: AppColors.darkTextPrimary),
-        displayMedium: AppTextStyles.heading2.copyWith(color: AppColors.darkTextPrimary),
-        displaySmall: AppTextStyles.heading3.copyWith(color: AppColors.darkTextPrimary),
-        bodyLarge: AppTextStyles.bodyLarge.copyWith(color: AppColors.darkTextPrimary),
-        bodyMedium: AppTextStyles.bodyNormal.copyWith(color: AppColors.darkTextPrimary),
-        bodySmall: AppTextStyles.bodySmall.copyWith(color: AppColors.darkTextPrimary),
-        labelSmall: AppTextStyles.caption.copyWith(color: AppColors.darkTextSecondary),
+        displayLarge: AppTextStyles.heading1.copyWith(
+          color: AppColors.darkTextPrimary,
+        ),
+        displayMedium: AppTextStyles.heading2.copyWith(
+          color: AppColors.darkTextPrimary,
+        ),
+        displaySmall: AppTextStyles.heading3.copyWith(
+          color: AppColors.darkTextPrimary,
+        ),
+        bodyLarge: AppTextStyles.bodyLarge.copyWith(
+          color: AppColors.darkTextPrimary,
+        ),
+        bodyMedium: AppTextStyles.bodyNormal.copyWith(
+          color: AppColors.darkTextPrimary,
+        ),
+        bodySmall: AppTextStyles.bodySmall.copyWith(
+          color: AppColors.darkTextPrimary,
+        ),
+        labelSmall: AppTextStyles.caption.copyWith(
+          color: AppColors.darkTextSecondary,
+        ),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.darkBackground,
@@ -126,18 +144,30 @@ class AppTheme {
         overlayColor: AppColors.darkPrimary.withOpacity(0.12),
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.resolveWith((states) => 
-          states.contains(MaterialState.selected) ? AppColors.darkPrimary : null),
-        trackColor: MaterialStateProperty.resolveWith((states) => 
-          states.contains(MaterialState.selected) ? AppColors.darkPrimary.withOpacity(0.5) : null),
+        thumbColor: MaterialStateProperty.resolveWith(
+          (states) => states.contains(MaterialState.selected)
+              ? AppColors.darkPrimary
+              : null,
+        ),
+        trackColor: MaterialStateProperty.resolveWith(
+          (states) => states.contains(MaterialState.selected)
+              ? AppColors.darkPrimary.withOpacity(0.5)
+              : null,
+        ),
       ),
       checkboxTheme: CheckboxThemeData(
-        fillColor: MaterialStateProperty.resolveWith((states) => 
-          states.contains(MaterialState.selected) ? AppColors.darkPrimary : null),
+        fillColor: MaterialStateProperty.resolveWith(
+          (states) => states.contains(MaterialState.selected)
+              ? AppColors.darkPrimary
+              : null,
+        ),
       ),
       radioTheme: RadioThemeData(
-        fillColor: MaterialStateProperty.resolveWith((states) => 
-          states.contains(MaterialState.selected) ? AppColors.darkPrimary : null),
+        fillColor: MaterialStateProperty.resolveWith(
+          (states) => states.contains(MaterialState.selected)
+              ? AppColors.darkPrimary
+              : null,
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -168,9 +198,7 @@ class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.darkSurface,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
     );
   }

@@ -244,6 +244,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await userProvider.resetApp();
 
       if (context.mounted) {
+        // Sync theme with newly reset preferences
+        context.read<ThemeProvider>().setDarkMode(
+          userProvider.preferences.isDarkMode,
+        );
+      }
+
+      if (context.mounted) {
         // Navigate to Onboarding and remove all previous routes
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const OnboardingScreen()),

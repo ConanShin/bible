@@ -128,7 +128,7 @@ class UserProvider with ChangeNotifier {
           b.chapterNumber == verse.chapterNumber &&
           b.verseNumber == verse.verseNumber,
     );
-    
+
     _bookmarks.insert(0, newBookmark);
     notifyListeners();
 
@@ -142,7 +142,7 @@ class UserProvider with ChangeNotifier {
 
     await _storage.deleteBookmark(id);
   }
-  
+
   Future<void> deleteBookmarkById(String id) async {
     _bookmarks.removeWhere((b) => b.id == id);
     notifyListeners();
@@ -155,13 +155,13 @@ class UserProvider with ChangeNotifier {
 
   Future<void> resetApp() async {
     await _storage.clearAllData();
-    
+
     // Reset in-memory state
     _hasCompletedOnboarding = false;
-    _preferences = UserPreferences(); // Back to default
+    _preferences = await _storage.getUserPreferences();
     _bookmarks = [];
     _readingHistory = [];
-    
+
     notifyListeners();
   }
 
