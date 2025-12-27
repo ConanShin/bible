@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/bible_book.dart';
 import '../../models/bible_chapter.dart';
-import '../../providers/bible_provider.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../../services/ad_service.dart';
 import '../../providers/bible_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../models/bible_verse.dart';
@@ -27,15 +28,42 @@ class BibleReadingScreen extends StatefulWidget {
 
 class _BibleReadingScreenState extends State<BibleReadingScreen> {
   final Map<int, GlobalKey> _verseKeys = {};
+  BannerAd? _bannerAd;
+  bool _isAdLoaded = false;
 
   @override
   void initState() {
     super.initState();
     _initKeys();
+    _loadBannerAd();
     // Scroll after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToVerse(widget.initialVerse);
     });
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+
+  void _loadBannerAd() {
+    _bannerAd = BannerAd(
+      adUnitId: AdService.bannerAdUnitId,
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _isAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          ad.dispose();
+        },
+      ),
+    )..load();
   }
 
   void _initKeys() {
@@ -91,91 +119,92 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder:
-          (context) => Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${verse.bookName} ${verse.chapterNumber}:${verse.verseNumber}',
+                style: AppTextStyles.heading3,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                verse.text,
+                style: AppTextStyles.bodyNormal.copyWith(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.6),
+                ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 24),
+              TextField(
+                controller: noteController,
+                decoration: const InputDecoration(
+                  hintText: '메모를 입력하세요 (선택)',
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.all(12),
+                ),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 24),
+              Row(
                 children: [
-                  Text(
-                    '${verse.bookName} ${verse.chapterNumber}:${verse.verseNumber}',
-                    style: AppTextStyles.heading3,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    verse.text,
-                    style: AppTextStyles.bodyNormal.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 24),
-                  TextField(
-                    controller: noteController,
-                    decoration: const InputDecoration(
-                      hintText: '메모를 입력하세요 (선택)',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.all(12),
-                    ),
-                    maxLines: 3,
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      if (isBookmarked)
-                        Expanded(
-                          child: TextButton(
-                            onPressed: () {
-                              userProvider.removeBookmark(verse);
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('북마크가 삭제되었습니다.')),
-                              );
-                            },
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.red,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                            ),
-                            child: const Text('삭제'),
-                          ),
+                  if (isBookmarked)
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          userProvider.removeBookmark(verse);
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('북마크가 삭제되었습니다.')),
+                          );
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.red,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                      if (isBookmarked) const SizedBox(width: 16),
-                      Expanded(
-                        flex: 2,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            userProvider.addBookmark(
-                              verse,
-                              note: noteController.text,
-                            );
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('북마크가 저장되었습니다.')),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text('저장'),
+                        child: const Text('삭제'),
+                      ),
+                    ),
+                  if (isBookmarked) const SizedBox(width: 16),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        userProvider.addBookmark(
+                          verse,
+                          note: noteController.text,
+                        );
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('북마크가 저장되었습니다.')),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                    ],
+                      child: const Text('저장'),
+                    ),
                   ),
                 ],
               ),
-            ),
+            ],
           ),
+        ),
+      ),
     );
   }
 
@@ -213,8 +242,8 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode 
-          ? Theme.of(context).scaffoldBackgroundColor 
+      backgroundColor: isDarkMode
+          ? Theme.of(context).scaffoldBackgroundColor
           : Theme.of(context).cardColor, // Paper color for light mode
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -249,12 +278,11 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                     vertical: 12,
                   ),
                   decoration: BoxDecoration(
-                    color:
-                        isTarget
-                            ? Theme.of(context).primaryColor.withOpacity(0.1)
-                            : (isBookmarked
-                                ? Colors.yellow.withOpacity(0.1)
-                                : null),
+                    color: isTarget
+                        ? Theme.of(context).primaryColor.withOpacity(0.1)
+                        : (isBookmarked
+                              ? Colors.yellow.withOpacity(0.1)
+                              : null),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,10 +293,11 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                           children: [
                             Text(
                               '${verse.verseNumber}',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).primaryColor,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(context).primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                             if (isBookmarked)
                               Padding(
@@ -285,17 +314,18 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                       Expanded(
                         child: Text(
                           verse.text,
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontSize: userProvider.preferences.fontSize,
-                            height: 1.6,
-                            decoration:
-                                isBookmarked
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
+                                fontSize: userProvider.preferences.fontSize,
+                                height: 1.6,
+                                decoration: isBookmarked
                                     ? TextDecoration.underline
                                     : null,
-                            decorationColor: Theme.of(context).primaryColor
-                                .withOpacity(0.3),
-                            decorationStyle: TextDecorationStyle.dashed,
-                          ),
+                                decorationColor: Theme.of(
+                                  context,
+                                ).primaryColor.withOpacity(0.3),
+                                decorationStyle: TextDecorationStyle.dashed,
+                              ),
                         ),
                       ),
                     ],
@@ -331,10 +361,11 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                           nextBook.id == widget.book.id
                               ? '다음 장 (${nextChapter.chapterNumber}장)'
                               : '다음 책 (${nextBook.name} 1장)',
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).primaryColor,
-                          ),
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).primaryColor,
+                              ),
                         ),
                         const SizedBox(width: 8),
                         const Icon(Icons.arrow_forward, size: 20),
@@ -347,6 +378,14 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: _isAdLoaded
+          ? Container(
+              alignment: Alignment.center,
+              width: _bannerAd!.size.width.toDouble(),
+              height: _bannerAd!.size.height.toDouble(),
+              child: AdWidget(ad: _bannerAd!),
+            )
+          : null,
     );
   }
 }

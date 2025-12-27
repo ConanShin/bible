@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'theme/app_theme.dart';
 import 'providers/bible_provider.dart';
 import 'providers/user_provider.dart';
@@ -8,7 +9,9 @@ import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/main_app.dart';
 import 'services/bible_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await MobileAds.instance.initialize();
   runApp(const BibleApp());
 }
 
