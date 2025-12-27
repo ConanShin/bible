@@ -1,35 +1,52 @@
-
 {
   "bibleVersions": [
     {
       "id": "krv",
       "name": "개역개정",
       "englishName": "Korean Revised Version",
-      "abbreviation": "개역개정"
+      "abbreviation": "개역개정",
+      "description": "한국교회 표준 성경. 1961년 개역한글을 현대어로 대폭 개정.",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_krv.json"
     },
     {
-      "id": "knv",
+      "id": "snkv",
       "name": "새번역",
-      "englishName": "Korean New Version",
-      "abbreviation": "새번역"
+      "englishName": "New Korean Version",
+      "abbreviation": "새번역",
+      "description": "일상어 중심의 현대적 번역. 이해하기 쉬운 표현, 청소년/일반인 대상.",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_snkv.json"
     },
     {
-      "id": "krv-std",
+      "id": "ncv",
       "name": "표준새번역",
-      "englishName": "Korean Revised Standard Version",
-      "abbreviation": "표준새번역"
+      "englishName": "New Korean Common Version",
+      "abbreviation": "표준새번역",
+      "description": "새번역의 정확성/표준성 강화. 현대어 유지하면서 원문 충실도 높임.",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_ncv.json"
     },
     {
-      "id": "easy",
-      "name": "쉬운성경",
-      "englishName": "Easy Bible",
-      "abbreviation": "쉬운성경"
-    },
-    {
-      "id": "krv-old",
+      "id": "ksv",
       "name": "개역한글",
-      "englishName": "Korean Revised Version (Old)",
-      "abbreviation": "개역한글"
+      "englishName": "Korean Standard Version",
+      "abbreviation": "개역한글",
+      "description": "1938년 개역판을 한글맞춤법 통일안에 맞춰 개정. 문어체 스타일 유지, 보수 교회 선호.",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_ksv.json"
+    },
+    {
+      "id": "kcb",
+      "name": "공동번역",
+      "englishName": "Korean Common Bible",
+      "abbreviation": "공동번역",
+      "description": "가톨릭/개신교 공동 번역. 생태계/평등 용어 현대화, 교파 간 통합 목적.",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_kcb.json"
+    },
+    {
+      "id": "kcb2",
+      "name": "공동번역 개정",
+      "englishName": "Revised Korean Common Bible",
+      "abbreviation": "공동번역개정",
+      "description": "공동번역의 문체/표현 최신화. 가톨릭-개신교 사용 지속.",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_kcb2.json"
     }
   ],
   "books": [
@@ -67,7 +84,7 @@
       "abbreviation": "마",
       "testament": "new",
       "totalChapters": 28,
-       "chapters": [
+      "chapters": [
         {
           "chapterNumber": 1,
           "verses": [

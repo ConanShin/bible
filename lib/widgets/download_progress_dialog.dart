@@ -18,14 +18,16 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
   double? _progress;
   String _currentFile = '';
   String _progressText = '0%';
-  String _sizeText = '0 MB';
+  String _sizeText = '0.00 MB';
   bool _isDownloading = true;
   String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _startDownload();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startDownload();
+    });
   }
 
   @override
@@ -46,24 +48,30 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
         onProgress: (received, total) {
           if (mounted) {
             setState(() {
-              int actualTotal = total;
-              if (actualTotal == -1) {
-                // Approximate 6MB for progress calculation if total is unknown
-                actualTotal = 6 * 1024 * 1024;
-              }
+              if (total > 0) {
+                // If received exceeds total (due to decompression), clamp it for UI consistency
+                final bool isProcessing = received >= total;
+                final displayReceived = isProcessing ? total : received;
 
-              _progress = received / actualTotal;
-              if (_progress! > 0.99 && total == -1)
-                _progress = 0.99; // Cap at 99% if total is unknown
+                _progress = isProcessing ? 1.0 : (displayReceived / total);
 
-              _progressText = '${(_progress! * 100).toStringAsFixed(1)}%';
+                if (isProcessing) {
+                  _progressText = '압축 해제 및 저장 중...';
+                } else {
+                  _progressText = '${(_progress! * 100).toStringAsFixed(1)}%';
+                }
 
-              final receivedMB = (received / 1024 / 1024).toStringAsFixed(1);
-              if (total != -1) {
-                final totalMB = (total / 1024 / 1024).toStringAsFixed(1);
+                final receivedMB = (displayReceived / 1024 / 1024)
+                    .toStringAsFixed(2);
+                final totalMB = (total / 1024 / 1024).toStringAsFixed(2);
                 _sizeText = '$receivedMB MB / $totalMB MB';
               } else {
-                _sizeText = '$receivedMB MB / ~6.0 MB';
+                // If total is unknown or 0, show indeterminate progress
+                _progress = null;
+                _progressText = '다운로드 중...';
+
+                final receivedMB = (received / 1024 / 1024).toStringAsFixed(2);
+                _sizeText = '$receivedMB MB';
               }
             });
           }
@@ -97,9 +105,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(
-        _errorMessage == null ? '성경 데이터 다운로드 중' : '다운로드 실패',
-      ),
+      title: Text(_errorMessage == null ? '성경 데이터 다운로드 중' : '다운로드 실패'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,10 +122,16 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  _progressText,
-                  style: Theme.of(context).textTheme.bodyLarge,
+                Expanded(
+                  child: Text(
+                    _progressText,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
+                const SizedBox(width: 8),
                 Text(_sizeText, style: Theme.of(context).textTheme.bodySmall),
               ],
             ),
@@ -154,9 +166,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
               Navigator.pop(context, false);
             }
           },
-          child: Text(
-            _errorMessage == null && !_isDownloading ? '닫기' : '취소',
-          ),
+          child: Text(_errorMessage == null && !_isDownloading ? '닫기' : '취소'),
         ),
       ],
     );

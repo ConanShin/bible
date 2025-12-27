@@ -11,14 +11,14 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 
 class BibleReadingScreen extends StatefulWidget {
-  final BibleBook book;
-  final BibleChapter chapter;
+  final int bookId;
+  final int chapterNumber;
   final int initialVerse;
 
   const BibleReadingScreen({
     super.key,
-    required this.book,
-    required this.chapter,
+    required this.bookId,
+    required this.chapterNumber,
     this.initialVerse = 1,
   });
 
@@ -34,7 +34,6 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
   @override
   void initState() {
     super.initState();
-    _initKeys();
     _loadBannerAd();
     // Scroll after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -66,9 +65,9 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
     )..load();
   }
 
-  void _initKeys() {
+  void _initKeys(BibleChapter chapter) {
     _verseKeys.clear();
-    for (var verse in widget.chapter.verses) {
+    for (var verse in chapter.verses) {
       _verseKeys[verse.verseNumber] = GlobalKey();
     }
   }
@@ -86,13 +85,13 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
     });
   }
 
-  void _navigateToNext(BibleBook nextBook, BibleChapter nextChapter) {
+  void _navigateToNext(int nextBookId, int nextChapterNumber) {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => BibleReadingScreen(
-          book: nextBook,
-          chapter: nextChapter,
+          bookId: nextBookId,
+          chapterNumber: nextChapterNumber,
           initialVerse: 1,
         ),
       ),
@@ -210,22 +209,55 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bibleProvider = context.read<BibleProvider>();
+    final bibleProvider = context.watch<BibleProvider>();
     final books = bibleProvider.books;
+
+    // Find current book and chapter objects dynamically based on ID and version
+    BibleBook? currentBook;
+    try {
+      currentBook = books.firstWhere((b) => b.id == widget.bookId);
+    } catch (_) {
+      // If book not found in current version, fallback or return error
+      return Scaffold(
+        appBar: AppBar(title: const Text('오류')),
+        body: const Center(child: Text('성경 데이터를 찾을 수 없습니다.')),
+      );
+    }
+
+    BibleChapter? currentChapter;
+    try {
+      currentChapter = currentBook.chapters.firstWhere(
+        (c) => c.chapterNumber == widget.chapterNumber,
+      );
+    } catch (_) {
+      currentChapter = currentBook.chapters.isNotEmpty
+          ? currentBook.chapters[0]
+          : null;
+    }
+
+    if (currentChapter == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('오류')),
+        body: const Center(child: Text('장 정보를 찾을 수 없습니다.')),
+      );
+    }
+
+    // Initialize keys for scrolling - do this here since it depends on the dynamic chapter
+    _initKeys(currentChapter);
 
     // Find next chapter/book
     BibleBook? nextBook;
     BibleChapter? nextChapter;
 
-    final currentChapterIndex = widget.book.chapters.indexWhere(
-      (c) => c.chapterNumber == widget.chapter.chapterNumber,
+    final currentChapterIndex = currentBook.chapters.indexWhere(
+      (c) => c.chapterNumber == currentChapter!.chapterNumber,
     );
 
-    if (currentChapterIndex < widget.book.chapters.length - 1) {
-      nextBook = widget.book;
-      nextChapter = widget.book.chapters[currentChapterIndex + 1];
+    if (currentChapterIndex < currentBook.chapters.length - 1) {
+      nextBook = currentBook;
+      nextChapter = currentBook.chapters[currentChapterIndex + 1];
     } else {
-      final currentBookIndex = books.indexWhere((b) => b.id == widget.book.id);
+      final currentBookIndex = books.indexWhere((b) => b.id == currentBook!.id);
       if (currentBookIndex < books.length - 1) {
         nextBook = books[currentBookIndex + 1];
         if (nextBook.chapters.isNotEmpty) {
@@ -234,7 +266,7 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
       }
     }
 
-    final isOldTestament = widget.book.testament == 'old';
+    final isOldTestament = currentBook.testament == 'old';
     final testamentColor = isOldTestament
         ? AppColors.oldTestament
         : AppColors.newTestament;
@@ -248,7 +280,7 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         leading: null,
-        title: Text('${widget.book.name} ${widget.chapter.chapterNumber}장'),
+        title: Text('${currentBook.name} ${currentChapter.chapterNumber}장'),
         actions: [
           IconButton(
             icon: const Icon(Icons.close, size: 22),
@@ -264,7 +296,7 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
         child: Column(
           children: [
             const SizedBox(height: 16),
-            ...widget.chapter.verses.map((verse) {
+            ...currentChapter.verses.map((verse) {
               final isTarget = verse.verseNumber == widget.initialVerse;
               final userProvider = context.watch<UserProvider>();
               final isBookmarked = userProvider.isBookmarked(verse);
@@ -342,7 +374,10 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: () => _navigateToNext(nextBook!, nextChapter!),
+                    onPressed: () => _navigateToNext(
+                      nextBook!.id,
+                      nextChapter!.chapterNumber,
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).cardColor,
                       foregroundColor: Theme.of(context).primaryColor,
@@ -358,7 +393,7 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          nextBook.id == widget.book.id
+                          nextBook.id == currentBook.id
                               ? '다음 장 (${nextChapter.chapterNumber}장)'
                               : '다음 책 (${nextBook.name} 1장)',
                           style: Theme.of(context).textTheme.bodyLarge

@@ -11,24 +11,12 @@ class BibleDataDownloadService {
   );
   final Logger _logger = Logger();
 
-  static const Map<String, String> _downloadUrls = {
-    'krv':
-        'https://github.com/ConanShin/assets/raw/refs/heads/main/bible_krv.json',
-    'knv': 'https://your-server.com/bibles/knv.json',
-    'easy': 'https://your-server.com/bibles/easy.json',
-    'rv': 'https://your-server.com/bibles/rv.json',
-  };
-
   Future<Map<String, dynamic>?> downloadBibleData({
     required String version,
+    required String url,
     required Function(int, int) onProgress,
     CancelToken? cancelToken,
   }) async {
-    final url = _downloadUrls[version];
-    if (url == null) {
-      throw Exception('Unsupported Bible version: $version');
-    }
-
     try {
       _logger.i('Starting download for Bible version: $version');
 

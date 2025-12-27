@@ -12,10 +12,12 @@ class SearchScreen extends StatefulWidget {
   State<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClientMixin {
+class _SearchScreenState extends State<SearchScreen>
+    with AutomaticKeepAliveClientMixin {
   final TextEditingController _searchController = TextEditingController();
   List<BibleVerse> _searchResults = [];
   bool _hasSearched = false;
+  String? _lastVersionId;
 
   List<InlineSpan> _buildHighlightedText(String text, String query) {
     if (query.trim().isEmpty) return [TextSpan(text: text)];
@@ -29,19 +31,22 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
     // However, for multiple terms, they might overlap or be out of order.
     // A robust way is to find all ranges of all terms and merge overlapping ones.
     // For simplicity given the requirement, let's just highlight exact matches of terms.
-    
+
     // Actually, splitting by regex keeping delimiters might be easier if we only had one term.
     // With multiple terms, let's use a simpler heuristic:
     // Split text by space, check each word if it contains any of the search terms.
-    
+
     // Better approach:
     // 1. Create a simplified version of text for matching (lowercase).
     // 2. Iterate through the text character by character or word by word?
     // Let's stick to a basic logic: Regex replace? No, Custom parser.
-    
+
     // Let's try matching all terms.
     // Create a regular expression from terms
-    final sortedTerms = terms.toList()..sort((a, b) => b.length.compareTo(a.length)); // match longer terms first
+    final sortedTerms = terms.toList()
+      ..sort(
+        (a, b) => b.length.compareTo(a.length),
+      ); // match longer terms first
     final pattern = RegExp(
       sortedTerms.map((t) => RegExp.escape(t)).join('|'),
       caseSensitive: false,
@@ -55,7 +60,7 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
             text: match.group(0),
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor, 
+              color: Theme.of(context).primaryColor,
               backgroundColor: Theme.of(context).primaryColor.withOpacity(0.15),
             ),
           ),
@@ -82,11 +87,7 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
       );
 
       // 2. Add to History
-      userProvider.addToHistory(
-        book,
-        verse.chapterNumber,
-        verse.verseNumber,
-      );
+      userProvider.addToHistory(book, verse.chapterNumber, verse.verseNumber);
 
       // 3. Show Reader Screen
       // Find the specific chapter object
@@ -99,8 +100,8 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
         context,
         MaterialPageRoute(
           builder: (context) => BibleReadingScreen(
-            book: book,
-            chapter: chapter,
+            bookId: book.id,
+            chapterNumber: chapter.chapterNumber,
             initialVerse: verse.verseNumber,
           ),
         ),
@@ -145,6 +146,17 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
     super.build(context);
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
+    // Reset search results if Bible version changed
+    final userProvider = context.watch<UserProvider>();
+    final currentVersionId = userProvider.preferences.selectedBibleVersion;
+    if (_lastVersionId != null && _lastVersionId != currentVersionId) {
+      // Version changed! Reset search results.
+      _searchResults = [];
+      _hasSearched = false;
+      _searchController.clear();
+    }
+    _lastVersionId = currentVersionId;
+
     return Scaffold(
       body: Column(
         children: [
@@ -176,72 +188,86 @@ class _SearchScreenState extends State<SearchScreen> with AutomaticKeepAliveClie
           Expanded(
             child: _hasSearched
                 ? _searchResults.isEmpty
-                    ? Center(
-                        child: Text(
-                          '검색 결과가 없습니다.',
-                          style: TextStyle(
-                            fontSize: 16, 
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                          ),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: _searchResults.length,
-                        itemBuilder: (context, index) {
-                          final verse = _searchResults[index];
-                          final fontSize = context.watch<UserProvider>().preferences.fontSize;
-                          
-                          return Card(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 4,
+                      ? Center(
+                          child: Text(
+                            '검색 결과가 없습니다.',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.5),
                             ),
-                            color: Theme.of(context).cardColor,
-                            child: ListTile(
-                              title: Text(
-                                '${verse.bookName} ${verse.chapterNumber}:${verse.verseNumber}',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: _searchResults.length,
+                          itemBuilder: (context, index) {
+                            final verse = _searchResults[index];
+                            final fontSize = context
+                                .watch<UserProvider>()
+                                .preferences
+                                .fontSize;
+
+                            return Card(
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 4,
                               ),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.only(top: 4.0),
-                                child: RichText(
-                                  text: TextSpan(
-                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      fontSize: fontSize,
-                                      height: 1.5,
-                                    ),
-                                    children: _buildHighlightedText(
-                                      verse.text,
-                                      _searchController.text,
+                              color: Theme.of(context).cardColor,
+                              child: ListTile(
+                                title: Text(
+                                  '${verse.bookName} ${verse.chapterNumber}:${verse.verseNumber}',
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                ),
+                                subtitle: Padding(
+                                  padding: const EdgeInsets.only(top: 4.0),
+                                  child: RichText(
+                                    text: TextSpan(
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            fontSize: fontSize,
+                                            height: 1.5,
+                                          ),
+                                      children: _buildHighlightedText(
+                                        verse.text,
+                                        _searchController.text,
+                                      ),
                                     ),
                                   ),
                                 ),
+                                onTap: () {
+                                  _openChapter(context, verse);
+                                },
                               ),
-                              onTap: () {
-                                _openChapter(context, verse);
-                              },
-                            ),
-                          );
-                        },
-                      )
+                            );
+                          },
+                        )
                 : Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.search, 
-                          size: 64, 
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)
+                          Icons.search,
+                          size: 64,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.2),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           '성경 구절을 검색해보세요',
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                          ),
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.5),
+                              ),
                         ),
                       ],
                     ),

@@ -28,13 +28,17 @@ class BookmarksScreen extends StatelessWidget {
                   Icon(
                     Icons.bookmark_border,
                     size: 64,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.3),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     '저장된 북마크가 없습니다.',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                 ],
@@ -46,10 +50,7 @@ class BookmarksScreen extends StatelessWidget {
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final bookmark = bookmarks[index];
-                return _BookmarkItem(
-                  bookmark: bookmark,
-                  fontSize: fontSize,
-                );
+                return _BookmarkItem(bookmark: bookmark, fontSize: fontSize);
               },
             ),
     );
@@ -60,10 +61,7 @@ class _BookmarkItem extends StatefulWidget {
   final Bookmark bookmark;
   final double fontSize;
 
-  const _BookmarkItem({
-    required this.bookmark,
-    required this.fontSize,
-  });
+  const _BookmarkItem({required this.bookmark, required this.fontSize});
 
   @override
   State<_BookmarkItem> createState() => _BookmarkItemState();
@@ -79,7 +77,25 @@ class _BookmarkItemState extends State<_BookmarkItem> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+    final bibleProvider = context.watch<BibleProvider>();
+    String displayVerseText = widget.bookmark.verseText;
+
+    // Try to get text from current version
+    try {
+      final book = bibleProvider.books.firstWhere(
+        (b) => b.name == widget.bookmark.bookName,
+      );
+      final chapter = book.chapters.firstWhere(
+        (c) => c.chapterNumber == widget.bookmark.chapterNumber,
+      );
+      final verse = chapter.verses.firstWhere(
+        (v) => v.verseNumber == widget.bookmark.verseNumber,
+      );
+      displayVerseText = verse.text;
+    } catch (_) {
+      // Fallback to stored text if not found in current version
+    }
+
     return Dismissible(
       key: Key(widget.bookmark.id),
       direction: DismissDirection.endToStart,
@@ -91,11 +107,7 @@ class _BookmarkItemState extends State<_BookmarkItem> {
         ),
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
-        child: const Icon(
-          Icons.delete_outline,
-          color: Colors.white,
-          size: 28,
-        ),
+        child: const Icon(Icons.delete_outline, color: Colors.white, size: 28),
       ),
       onDismissed: (direction) {
         context.read<UserProvider>().deleteBookmarkById(widget.bookmark.id);
@@ -103,8 +115,9 @@ class _BookmarkItemState extends State<_BookmarkItem> {
           SnackBar(
             content: const Text('북마크가 삭제되었습니다.'),
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         );
       },
@@ -114,8 +127,8 @@ class _BookmarkItemState extends State<_BookmarkItem> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: isDarkMode 
-                  ? Colors.black.withOpacity(0.2) 
+              color: isDarkMode
+                  ? Colors.black.withOpacity(0.2)
                   : Colors.black.withOpacity(0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
@@ -152,16 +165,17 @@ class _BookmarkItemState extends State<_BookmarkItem> {
                           const SizedBox(width: 8),
                           Text(
                             '${widget.bookmark.bookName} ${widget.bookmark.chapterNumber}:${widget.bookmark.verseNumber}',
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(fontWeight: FontWeight.w700),
                           ),
                         ],
                       ),
                       Text(
                         _formatDate(widget.bookmark.createdAt),
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.6),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -172,7 +186,7 @@ class _BookmarkItemState extends State<_BookmarkItem> {
 
                   // Verse Text
                   Text(
-                    widget.bookmark.verseText,
+                    displayVerseText,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -192,19 +206,25 @@ class _BookmarkItemState extends State<_BookmarkItem> {
                                 _isExpanded = !_isExpanded;
                               });
                             }
-                          : null, 
+                          : null,
                       child: Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: isDarkMode 
-                              ? Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5) 
-                              : Theme.of(context).primaryColor.withOpacity(0.1), // Match primary theme color tint
+                          color: isDarkMode
+                              ? Theme.of(
+                                  context,
+                                ).colorScheme.surfaceVariant.withOpacity(0.5)
+                              : Theme.of(context).primaryColor.withOpacity(
+                                  0.1,
+                                ), // Match primary theme color tint
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: isDarkMode 
-                                ? Colors.white.withOpacity(0.05) 
-                                : Theme.of(context).primaryColor.withOpacity(0.1),
+                            color: isDarkMode
+                                ? Colors.white.withOpacity(0.05)
+                                : Theme.of(
+                                    context,
+                                  ).primaryColor.withOpacity(0.1),
                           ),
                         ),
                         child: Column(
@@ -212,17 +232,20 @@ class _BookmarkItemState extends State<_BookmarkItem> {
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.edit_note,
-                                    size: 16,
-                                    color: Theme.of(context).primaryColor),
+                                Icon(
+                                  Icons.edit_note,
+                                  size: 16,
+                                  color: Theme.of(context).primaryColor,
+                                ),
                                 const SizedBox(width: 6),
                                 Text(
                                   'MEMO',
-                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                    color: Theme.of(context).primaryColor,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.5,
-                                  ),
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(
+                                        color: Theme.of(context).primaryColor,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                      ),
                                 ),
                               ],
                             ),
@@ -232,17 +255,19 @@ class _BookmarkItemState extends State<_BookmarkItem> {
                                 widget.bookmark.note!,
                                 maxLines: 3,
                                 overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  fontSize: widget.fontSize * 0.9,
-                                  height: 1.5,
-                                ),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      fontSize: widget.fontSize * 0.9,
+                                      height: 1.5,
+                                    ),
                               ),
                               secondChild: Text(
                                 widget.bookmark.note!,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  fontSize: widget.fontSize * 0.9,
-                                  height: 1.5,
-                                ),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      fontSize: widget.fontSize * 0.9,
+                                      height: 1.5,
+                                    ),
                               ),
                               crossFadeState: _isExpanded
                                   ? CrossFadeState.showSecond
@@ -257,19 +282,30 @@ class _BookmarkItemState extends State<_BookmarkItem> {
                                   children: [
                                     Text(
                                       _isExpanded ? '접기' : '전체 보기',
-                                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelSmall
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withOpacity(0.6),
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                     ),
                                     const SizedBox(width: 4),
                                     AnimatedRotation(
                                       turns: _isExpanded ? 0.5 : 0,
-                                      duration: const Duration(milliseconds: 300),
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
                                       child: Icon(
                                         Icons.keyboard_arrow_down,
                                         size: 16,
-                                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withOpacity(0.6),
                                       ),
                                     ),
                                   ],
@@ -303,16 +339,16 @@ class _BookmarkItemState extends State<_BookmarkItem> {
         context,
         MaterialPageRoute(
           builder: (context) => BibleReadingScreen(
-            book: book,
-            chapter: chapter,
+            bookId: book.id,
+            chapterNumber: chapter.chapterNumber,
             initialVerse: widget.bookmark.verseNumber,
           ),
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('해당 구절을 찾을 수 없습니다.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('해당 구절을 찾을 수 없습니다.')));
     }
   }
 

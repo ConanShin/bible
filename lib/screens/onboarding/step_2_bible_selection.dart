@@ -66,10 +66,8 @@ class Step2BibleSelection extends StatelessWidget {
                     final version = versions[index];
                     final String versionId = version['id'];
                     final String versionName = version['name'];
-                    // Mock descriptions for now
-                    String description = "한국 교회의 가장 널리 사용되는 번역";
-                    if (versionId == 'knv') description = "직역성과 가독성의 균형잡은 번역";
-                    if (versionId == 'easy') description = "현대인을 위해 알기 쉽게 번역";
+                    final String description =
+                        version['description'] ?? "설명이 없습니다.";
 
                     return Consumer<UserProvider>(
                       builder: (context, userProvider, _) {
@@ -96,15 +94,17 @@ class Step2BibleSelection extends StatelessWidget {
                               border: Border.all(
                                 color: isSelected
                                     ? Theme.of(context).primaryColor
-                                    : Theme.of(context).dividerColor.withOpacity(0.1),
+                                    : Theme.of(
+                                        context,
+                                      ).dividerColor.withOpacity(0.1),
                                 width: isSelected ? 2 : 1,
                               ),
                               boxShadow: [
                                 if (isSelected)
                                   BoxShadow(
-                                    color: Theme.of(context).primaryColor.withOpacity(
-                                      0.1,
-                                    ),
+                                    color: Theme.of(
+                                      context,
+                                    ).primaryColor.withOpacity(0.1),
                                     blurRadius: 8,
                                     offset: const Offset(0, 2),
                                   ),
@@ -119,17 +119,26 @@ class Step2BibleSelection extends StatelessWidget {
                                     children: [
                                       Text(
                                         versionName,
-                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                       ),
                                       const SizedBox(height: AppSpacing.xs),
                                       Text(
                                         description,
-                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface
+                                                  .withOpacity(0.6),
+                                            ),
                                       ),
                                     ],
                                   ),

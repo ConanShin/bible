@@ -78,8 +78,8 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) =>
               BibleReadingScreen(
-                book: _selectedBook!,
-                chapter: _selectedChapter!,
+                bookId: _selectedBook!.id,
+                chapterNumber: _selectedChapter!.chapterNumber,
                 initialVerse: verseNumber,
               ),
           transitionDuration: Duration.zero,
@@ -207,7 +207,11 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
               height: 3,
               margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
-                color: isActive ? activeColor : Theme.of(index < 0 ? context : context).dividerColor.withOpacity(0.1),
+                color: isActive
+                    ? activeColor
+                    : Theme.of(
+                        index < 0 ? context : context,
+                      ).dividerColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -231,11 +235,13 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
               Tab(text: '신약성경'),
             ],
             labelColor: Theme.of(context).colorScheme.onSurface,
-            unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+            unselectedLabelColor: Theme.of(
+              context,
+            ).colorScheme.onSurface.withOpacity(0.4),
             indicator: UnderlineTabIndicator(
               borderSide: BorderSide(
                 width: 3,
-                color: Theme.of(context).primaryColor, 
+                color: Theme.of(context).primaryColor,
               ),
             ),
             // Custom TabBar logic to support different colors for each tab
@@ -266,7 +272,11 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1))),
+              border: Border(
+                bottom: BorderSide(
+                  color: Theme.of(context).dividerColor.withOpacity(0.1),
+                ),
+              ),
             ),
             child: Row(
               children: [
@@ -301,7 +311,9 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
                       Text(
                         book.englishName,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withOpacity(0.4),
                         ),
                       ),
                     ],
@@ -310,7 +322,9 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
                 Icon(
                   Icons.chevron_right,
                   size: 20,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.2),
                 ),
               ],
             ),
@@ -377,7 +391,9 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
-                    border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+                    border: Border.all(
+                      color: Theme.of(context).dividerColor.withOpacity(0.1),
+                    ),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(

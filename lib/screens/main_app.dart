@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'home/home_screen.dart';
 import 'search/search_screen.dart';
 import 'bookmarks/bookmarks_screen.dart';
@@ -39,7 +38,7 @@ class _MainAppState extends State<MainApp> {
     setState(() {
       _selectedIndex = index;
     });
-    
+
     _pageController.animateToPage(
       index,
       duration: const Duration(milliseconds: 300),
@@ -52,27 +51,14 @@ class _MainAppState extends State<MainApp> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          '성경책 앱',
-          style: TextStyle(fontWeight: FontWeight.bold), // Using default or style from theme
+          '심플 성경',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ), // Using default or style from theme
         ),
         elevation: 1,
         // backgroundColor: Colors.white, // Removed to support dark mode
         // foregroundColor: AppColors.textPrimary, // Removed to support dark mode
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {
-              // Notification TODO
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () {
-              // Settings TODO (or navigate to tab 3)
-              _onNavBarTapped(3);
-            },
-          ),
-        ],
       ),
       body: PageView(
         controller: _pageController,
@@ -88,25 +74,15 @@ class _MainAppState extends State<MainApp> {
         onTap: _onNavBarTapped,
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+        unselectedItemColor: Theme.of(
+          context,
+        ).colorScheme.onSurface.withOpacity(0.4),
         showUnselectedLabels: true,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book),
-            label: '읽기',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: '검색',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: '북마크',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: '설정',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: '읽기'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: '검색'),
+          BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: '북마크'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: '설정'),
         ],
       ),
     );

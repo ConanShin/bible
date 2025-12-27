@@ -238,8 +238,18 @@ class LocalStorageService {
     final storedVersion = sp.getString(KEY_BIBLE_VERSION) ?? 'krv';
     final version = _migrateLegacyVersion(storedVersion);
 
+    // Determine default dark mode from system settings
+    bool defaultDarkMode = false;
+    try {
+      final brightness =
+          WidgetsBinding.instance.platformDispatcher.platformBrightness;
+      defaultDarkMode = brightness == Brightness.dark;
+    } catch (_) {
+      // Fallback if binding not initialized
+    }
+
     return UserPreferences(
-      isDarkMode: sp.getBool(KEY_THEME_MODE) ?? false,
+      isDarkMode: sp.getBool(KEY_THEME_MODE) ?? defaultDarkMode,
       fontSize: sp.getDouble(KEY_FONT_SIZE) ?? 16.0,
       selectedBibleVersion: version,
       isNotificationEnabled: sp.getBool(KEY_NOTIF_ENABLED) ?? false,

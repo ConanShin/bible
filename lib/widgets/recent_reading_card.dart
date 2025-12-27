@@ -16,26 +16,22 @@ class RecentReadingCard extends StatelessWidget {
 
     // Use lighter colors for Dark Mode visibility
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     final displayColor = isDarkMode
-        ? (isOldTestament 
-            ? const Color(0xFF9FA8DA) // Indigo 200 for Dark Mode
-            : const Color(0xFFBCAAA4)) // Brown 200 for Dark Mode
+        ? (isOldTestament
+              ? const Color(0xFF9FA8DA) // Indigo 200 for Dark Mode
+              : const Color(0xFFBCAAA4)) // Brown 200 for Dark Mode
         : (isOldTestament ? AppColors.oldTestament : AppColors.newTestament);
 
     return InkWell(
       onTap: () {
-        final chapterIndex = (item.chapterNumber - 1).clamp(
-          0,
-          item.book.chapters.length - 1,
-        );
         Navigator.push(
           context,
           MaterialPageRoute(
             fullscreenDialog: true,
             builder: (context) => BibleReadingScreen(
-              book: item.book,
-              chapter: item.book.chapters[chapterIndex],
+              bookId: item.book.id,
+              chapterNumber: item.chapterNumber,
               initialVerse: item.verseNumber,
             ),
           ),
@@ -48,9 +44,7 @@ class RecentReadingCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Theme.of(context).dividerColor,
-          ),
+          border: Border.all(color: Theme.of(context).dividerColor),
           boxShadow: [
             BoxShadow(
               color: Theme.of(context).shadowColor.withOpacity(0.08),
@@ -85,7 +79,9 @@ class RecentReadingCard extends StatelessWidget {
                   Text(
                     '${item.chapterNumber}장 ${item.verseNumber}절 읽음',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
                 ],

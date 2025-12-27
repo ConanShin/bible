@@ -54,36 +54,63 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const Icon(Icons.text_fields, size: 24),
                   ],
                 ),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Theme.of(context).dividerColor.withOpacity(0.1),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '창세기 1:1',
-                        style: AppTextStyles.caption.copyWith(
-                          color: Theme.of(context).primaryColor,
-                          fontWeight: FontWeight.bold,
+                Consumer<BibleProvider>(
+                  builder: (context, bibleProvider, _) {
+                    String previewText = '태초에 하나님이 천지를 창조하시니라';
+                    String previewRef = '창세기 1:1';
+
+                    try {
+                      if (bibleProvider.books.isNotEmpty) {
+                        final firstBook = bibleProvider.books.first;
+                        if (firstBook.chapters.isNotEmpty) {
+                          final firstChapter = firstBook.chapters.first;
+                          if (firstChapter.verses.isNotEmpty) {
+                            final firstVerse = firstChapter.verses.first;
+                            previewText = firstVerse.text;
+                            previewRef =
+                                '${firstBook.name} ${firstChapter.chapterNumber}:${firstVerse.verseNumber}';
+                          }
+                        }
+                      }
+                    } catch (e) {
+                      // Fallback to default
+                    }
+
+                    return Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).dividerColor.withOpacity(0.1),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '태초에 하나님이 천지를 창조하시니라',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontSize: preferences.fontSize,
-                          height: 1.5,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            previewRef,
+                            style: AppTextStyles.caption.copyWith(
+                              color: Theme.of(context).primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            previewText,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  fontSize: preferences.fontSize,
+                                  height: 1.5,
+                                ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 8),
               ],
@@ -104,13 +131,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             title: const Text('성경 버전'),
             subtitle: Text(
-              preferences.selectedBibleVersion == 'krv'
-                  ? '개역개정'
-                  : preferences.selectedBibleVersion == 'knv'
-                  ? '새번역'
-                  : preferences.selectedBibleVersion == 'easy'
-                  ? '쉬운성경'
-                  : '개역한글',
+              _getVersionName(context, preferences.selectedBibleVersion),
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showBibleVersionSelector(context),
@@ -173,7 +194,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
 
           const Divider(),
-          
+
           ListTile(
             title: Text(
               '앱 초기화',
@@ -184,7 +205,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: const Text('모든 데이터가 삭제되고 초기 상태로 돌아갑니다.'),
             onTap: () => _showResetConfirmation(context),
           ),
-          
+
           const SizedBox(height: 32),
         ],
       ),
@@ -221,7 +242,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (confirmed == true && context.mounted) {
       final userProvider = context.read<UserProvider>();
       await userProvider.resetApp();
-      
+
       if (context.mounted) {
         // Navigate to Onboarding and remove all previous routes
         Navigator.of(context).pushAndRemoveUntil(
@@ -250,12 +271,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final bibleProvider = context.read<BibleProvider>();
     final currentVersion = userProvider.preferences.selectedBibleVersion;
 
-    final versions = [
-      {'id': 'krv', 'name': '개역개정'},
-      {'id': 'knv', 'name': '새번역'},
-      {'id': 'easy', 'name': '쉬운성경'},
-      {'id': 'rv', 'name': '개역한글'},
-    ];
+    final versions = await bibleProvider.getAvailableVersions();
+
+    if (!mounted) return;
 
     final String? selected = await showModalBottomSheet<String>(
       context: context,
@@ -282,20 +300,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  String _getVersionName(BuildContext context, String versionId) {
+    final bibleProvider = context.read<BibleProvider>();
+    // Since this might be called during build, accessing provider is fine if watched or read.
+    // However, read inside build (or helper called by build) is safe if context is correct.
+    // Ideally use data from watch in build. But for helper, let's look it up from cached versions list if possible.
+    try {
+      final version = bibleProvider.versions.firstWhere(
+        (v) => v['id'] == versionId,
+        orElse: () => {'name': versionId},
+      );
+      return version['name'];
+    } catch (e) {
+      return versionId;
+    }
+  }
+
   Future<void> _onBibleVersionChanged(String newVersion) async {
+    final versionName = _getVersionName(context, newVersion);
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('성경 버전 변경'),
-        content: Text(
-          '${newVersion == 'krv'
-              ? '개역개정'
-              : newVersion == 'knv'
-              ? '새번역'
-              : newVersion == 'easy'
-              ? '쉬운성경'
-              : '개역한글'} 버전을 다운로드하시겠습니까?\n네트워크 연결이 필요합니다.',
-        ),
+        content: Text('$versionName 버전을 다운로드하시겠습니까?\n네트워크 연결이 필요합니다.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
