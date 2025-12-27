@@ -15,12 +15,31 @@ class BibleSelectionScreen extends StatefulWidget {
   State<BibleSelectionScreen> createState() => _BibleSelectionScreenState();
 }
 
-class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
-  final PageController _pageController = PageController();
+class _BibleSelectionScreenState extends State<BibleSelectionScreen>
+    with SingleTickerProviderStateMixin {
+  late PageController _pageController;
+  late TabController _tabController;
   int _step = 0; // 0: Book, 1: Chapter, 2: Verse
   BibleBook? _selectedBook;
   BibleChapter? _selectedChapter;
   bool _isExpanding = false;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _pageController.dispose();
+    _tabController.dispose();
+    super.dispose();
+  }
 
   void _nextStep() {
     _pageController.nextPage(
@@ -222,41 +241,137 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen> {
   }
 
   Widget _buildBookStep(List<BibleBook> books) {
-    final oldBooks = books.where((b) => b.testament == 'old').toList();
-    final newBooks = books.where((b) => b.testament == 'new').toList();
+    final filteredBooks = books.where((book) {
+      final query = _searchQuery.toLowerCase();
+      return book.name.toLowerCase().contains(query) ||
+          book.englishName.toLowerCase().contains(query);
+    }).toList();
 
-    return DefaultTabController(
-      length: 2,
-      child: Column(
-        children: [
-          TabBar(
-            tabs: const [
-              Tab(text: '구약성경'),
-              Tab(text: '신약성경'),
+    final oldBooks = filteredBooks.where((b) => b.testament == 'old').toList();
+    final newBooks = filteredBooks.where((b) => b.testament == 'new').toList();
+
+    return Column(
+      children: [
+        _buildSearchBar(books),
+        Expanded(
+          child: Column(
+            children: [
+              TabBar(
+                controller: _tabController,
+                tabs: const [
+                  Tab(text: '구약성경'),
+                  Tab(text: '신약성경'),
+                ],
+                labelColor: Theme.of(context).colorScheme.onSurface,
+                unselectedLabelColor: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withOpacity(0.4),
+                indicator: UnderlineTabIndicator(
+                  borderSide: BorderSide(
+                    width: 3,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildBookListView(oldBooks, AppColors.oldTestament),
+                    _buildBookListView(newBooks, AppColors.newTestament),
+                  ],
+                ),
+              ),
             ],
-            labelColor: Theme.of(context).colorScheme.onSurface,
-            unselectedLabelColor: Theme.of(
-              context,
-            ).colorScheme.onSurface.withOpacity(0.4),
-            indicator: UnderlineTabIndicator(
-              borderSide: BorderSide(
-                width: 3,
-                color: Theme.of(context).primaryColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSearchBar(List<BibleBook> allBooks) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+      child: Container(
+        height: 44,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: Theme.of(context).dividerColor.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.search,
+              size: 20,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TextField(
+                controller: _searchController,
+                textAlignVertical: TextAlignVertical.center,
+                style: const TextStyle(fontSize: 14),
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+
+                    // Auto-switch tabs based on the first match
+                    if (value.isNotEmpty) {
+                      try {
+                        final firstMatch = allBooks.firstWhere((book) {
+                          final query = value.toLowerCase();
+                          return book.name.toLowerCase().contains(query) ||
+                              book.englishName.toLowerCase().contains(query);
+                        });
+
+                        final targetIndex = firstMatch.testament == 'old'
+                            ? 0
+                            : 1;
+                        if (_tabController.index != targetIndex) {
+                          _tabController.animateTo(targetIndex);
+                        }
+                      } catch (_) {
+                        // No match found
+                      }
+                    }
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: '성경 검색 (예: 창세, Gen)',
+                  hintStyle: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.35),
+                    fontSize: 14,
+                  ),
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
               ),
             ),
-            // Custom TabBar logic to support different colors for each tab
-            // For simplicity, we can use a more dynamic approach if needed
-            // but let's try to keep it clean.
-          ),
-          Expanded(
-            child: TabBarView(
-              children: [
-                _buildBookListView(oldBooks, AppColors.oldTestament),
-                _buildBookListView(newBooks, AppColors.newTestament),
-              ],
-            ),
-          ),
-        ],
+            if (_searchQuery.isNotEmpty)
+              GestureDetector(
+                onTap: () {
+                  _searchController.clear();
+                  setState(() {
+                    _searchQuery = '';
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Icon(
+                    Icons.cancel,
+                    size: 20,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.3),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
