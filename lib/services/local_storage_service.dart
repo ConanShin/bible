@@ -20,6 +20,7 @@ class LocalStorageService {
   static const String KEY_NOTIF_ENABLED = 'notification_enabled';
   static const String KEY_NOTIF_TIME_HOUR = 'notification_time_hour';
   static const String KEY_NOTIF_TIME_MINUTE = 'notification_time_minute';
+  static const String KEY_APP_LANGUAGE = 'app_language';
   static const String KEY_BOOKMARKS = 'bookmarks';
 
   static Database? _database;
@@ -228,6 +229,7 @@ class LocalStorageService {
     await sp.setBool(KEY_THEME_MODE, prefs.isDarkMode);
     await sp.setDouble(KEY_FONT_SIZE, prefs.fontSize);
     await sp.setString(KEY_BIBLE_VERSION, prefs.selectedBibleVersion);
+    await sp.setString(KEY_APP_LANGUAGE, prefs.appLanguage);
     await sp.setBool(KEY_NOTIF_ENABLED, prefs.isNotificationEnabled);
     await sp.setInt(KEY_NOTIF_TIME_HOUR, prefs.dailyNotificationTime.hour);
     await sp.setInt(KEY_NOTIF_TIME_MINUTE, prefs.dailyNotificationTime.minute);
@@ -252,6 +254,7 @@ class LocalStorageService {
       isDarkMode: sp.getBool(KEY_THEME_MODE) ?? defaultDarkMode,
       fontSize: sp.getDouble(KEY_FONT_SIZE) ?? 16.0,
       selectedBibleVersion: version,
+      appLanguage: sp.getString(KEY_APP_LANGUAGE) ?? 'ko',
       isNotificationEnabled: sp.getBool(KEY_NOTIF_ENABLED) ?? false,
       dailyNotificationTime: TimeOfDay(
         hour: sp.getInt(KEY_NOTIF_TIME_HOUR) ?? 6,

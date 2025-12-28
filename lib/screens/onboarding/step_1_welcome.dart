@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
+import 'package:provider/provider.dart';
 import '../../theme/app_text_styles.dart';
 import '../../theme/spacing.dart';
+import '../../l10n/app_strings.dart';
+import '../../providers/user_provider.dart';
 
 class Step1Welcome extends StatelessWidget {
   final VoidCallback onNext;
@@ -10,42 +12,41 @@ class Step1Welcome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+    final lang = userProvider.preferences.appLanguage;
+
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
-      padding: const EdgeInsets.all(AppSpacing.xxxl),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Logo placeholder (simulated with Icon for now)
+          const Spacer(),
+          // Illustration or Logo placeholder
           Container(
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
               color: Theme.of(context).primaryColor.withOpacity(0.1),
+              shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.menu_book_rounded,
+              Icons.auto_stories_rounded,
               size: 60,
               color: Theme.of(context).primaryColor,
             ),
           ),
-          const SizedBox(height: AppSpacing.xxxl),
-
+          const SizedBox(height: AppSpacing.xxl),
           Text(
-            "성경 읽기 여정을\n시작하세요",
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.displayLarge?.copyWith(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-            ),
+            AppStrings.get('welcome_title', lang),
+            style: AppTextStyles.heading1,
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.md),
           Text(
-            "함께하는 말씀으로\n매일을 의미있게 만드세요.",
+            AppStrings.get('welcome_subtitle', lang),
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            style: AppTextStyles.bodyNormal.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
             ),
           ),
 
@@ -57,18 +58,11 @@ class Step1Welcome extends StatelessWidget {
             child: ElevatedButton(
               onPressed: onNext,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                ),
-              ),
-              child: Text(
-                "다음",
-                style: AppTextStyles.bodyNormal.copyWith(
+                textStyle: AppTextStyles.bodyNormal.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              child: Text(AppStrings.get('next', lang)),
             ),
           ),
           const SizedBox(height: AppSpacing.xxxl),

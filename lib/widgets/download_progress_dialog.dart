@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import '../services/bible_service.dart';
 import 'package:provider/provider.dart';
+import '../providers/user_provider.dart';
+import '../l10n/app_strings.dart';
 
 class DownloadProgressDialog extends StatefulWidget {
   final String bibleVersion;
@@ -40,6 +42,8 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
 
   Future<void> _startDownload() async {
     final bibleService = context.read<BibleService>();
+    final userProvider = context.read<UserProvider>();
+    final lang = userProvider.preferences.appLanguage;
 
     try {
       await bibleService.downloadBibleData(
@@ -56,7 +60,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
                 _progress = isProcessing ? 1.0 : (displayReceived / total);
 
                 if (isProcessing) {
-                  _progressText = '압축 해제 및 저장 중...';
+                  _progressText = AppStrings.get('download_processing', lang);
                 } else {
                   _progressText = '${(_progress! * 100).toStringAsFixed(1)}%';
                 }
@@ -68,7 +72,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
               } else {
                 // If total is unknown or 0, show indeterminate progress
                 _progress = null;
-                _progressText = '다운로드 중...';
+                _progressText = AppStrings.get('downloading_status', lang);
 
                 final receivedMB = (received / 1024 / 1024).toStringAsFixed(2);
                 _sizeText = '$receivedMB MB';
@@ -93,7 +97,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
         setState(() {
           _isDownloading = false;
           if (e is DioException && e.type == DioExceptionType.cancel) {
-            _errorMessage = '다운로드가 취소되었습니다';
+            _errorMessage = AppStrings.get('download_cancelled', lang);
           } else {
             _errorMessage = e.toString();
           }
@@ -104,8 +108,13 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = context.watch<UserProvider>().preferences.appLanguage;
     return AlertDialog(
-      title: Text(_errorMessage == null ? '성경 데이터 다운로드 중' : '다운로드 실패'),
+      title: Text(
+        _errorMessage == null
+            ? AppStrings.get('downloading_bible', lang)
+            : AppStrings.get('download_failed', lang),
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,7 +146,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
             ),
             const SizedBox(height: 8),
             Text(
-              '오프라인 성경 사용을 위해 다운로드가 필요합니다.',
+              AppStrings.get('download_required', lang),
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
@@ -154,7 +163,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
               });
               _startDownload();
             },
-            child: const Text('재시도'),
+            child: Text(AppStrings.get('download_retry', lang)),
           ),
 
         TextButton(
@@ -166,7 +175,11 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
               Navigator.pop(context, false);
             }
           },
-          child: Text(_errorMessage == null && !_isDownloading ? '닫기' : '취소'),
+          child: Text(
+            _errorMessage == null && !_isDownloading
+                ? AppStrings.get('download_close', lang)
+                : AppStrings.get('cancel', lang),
+          ),
         ),
       ],
     );

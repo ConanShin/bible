@@ -1,4 +1,3 @@
-
 import 'bible_chapter.dart';
 
 class BibleBook {
@@ -20,10 +19,16 @@ class BibleBook {
     required this.chapters,
   });
 
+  String getDisplayName(String lang) {
+    return lang == 'ko' ? name : englishName;
+  }
+
   factory BibleBook.fromJson(Map<String, dynamic> json) {
     var list = json['chapters'] as List;
     String bookName = json['name'] as String;
-    List<BibleChapter> chaptersList = list.map((i) => BibleChapter.fromJson(i, bookName)).toList();
+    List<BibleChapter> chaptersList = list
+        .map((i) => BibleChapter.fromJson(i, bookName))
+        .toList();
 
     return BibleBook(
       id: json['id'] as int,

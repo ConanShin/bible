@@ -261,6 +261,358 @@ class BibleDataParser {
       'englishName': 'Revelation',
       'testament': 'new',
     },
+    // English Abbreviations
+    'Gen': {
+      'id': 1,
+      'name': '창세기',
+      'englishName': 'Genesis',
+      'testament': 'old',
+    },
+    'Exo': {
+      'id': 2,
+      'name': '출애굽기',
+      'englishName': 'Exodus',
+      'testament': 'old',
+    },
+    'Lev': {
+      'id': 3,
+      'name': '레위기',
+      'englishName': 'Leviticus',
+      'testament': 'old',
+    },
+    'Num': {
+      'id': 4,
+      'name': '민수기',
+      'englishName': 'Numbers',
+      'testament': 'old',
+    },
+    'Deu': {
+      'id': 5,
+      'name': '신명기',
+      'englishName': 'Deuteronomy',
+      'testament': 'old',
+    },
+    'Jos': {
+      'id': 6,
+      'name': '여호수아',
+      'englishName': 'Joshua',
+      'testament': 'old',
+    },
+    'Jdg': {
+      'id': 7,
+      'name': '사사기',
+      'englishName': 'Judges',
+      'testament': 'old',
+    },
+    'Rut': {'id': 8, 'name': '룻기', 'englishName': 'Ruth', 'testament': 'old'},
+    '1Sa': {
+      'id': 9,
+      'name': '사무엘상',
+      'englishName': '1 Samuel',
+      'testament': 'old',
+    },
+    '2Sa': {
+      'id': 10,
+      'name': '사무엘하',
+      'englishName': '2 Samuel',
+      'testament': 'old',
+    },
+    '1Ki': {
+      'id': 11,
+      'name': '열왕기상',
+      'englishName': '1 Kings',
+      'testament': 'old',
+    },
+    '2Ki': {
+      'id': 12,
+      'name': '열왕기하',
+      'englishName': '2 Kings',
+      'testament': 'old',
+    },
+    '1Ch': {
+      'id': 13,
+      'name': '역대상',
+      'englishName': '1 Chronicles',
+      'testament': 'old',
+    },
+    '2Ch': {
+      'id': 14,
+      'name': '역대하',
+      'englishName': '2 Chronicles',
+      'testament': 'old',
+    },
+    'Ezr': {'id': 15, 'name': '에스라', 'englishName': 'Ezra', 'testament': 'old'},
+    'Neh': {
+      'id': 16,
+      'name': '느헤미야',
+      'englishName': 'Nehemiah',
+      'testament': 'old',
+    },
+    'Est': {
+      'id': 17,
+      'name': '에스더',
+      'englishName': 'Esther',
+      'testament': 'old',
+    },
+    'Job': {'id': 18, 'name': '욥기', 'englishName': 'Job', 'testament': 'old'},
+    'Psa': {
+      'id': 19,
+      'name': '시편',
+      'englishName': 'Psalms',
+      'testament': 'old',
+    },
+    'Pro': {
+      'id': 20,
+      'name': '잠언',
+      'englishName': 'Proverbs',
+      'testament': 'old',
+    },
+    'Ecc': {
+      'id': 21,
+      'name': '전도서',
+      'englishName': 'Ecclesiastes',
+      'testament': 'old',
+    },
+    'Sng': {
+      'id': 22,
+      'name': '아가',
+      'englishName': 'Song of Solomon',
+      'testament': 'old',
+    },
+    'Isa': {
+      'id': 23,
+      'name': '이사야',
+      'englishName': 'Isaiah',
+      'testament': 'old',
+    },
+    'Jer': {
+      'id': 24,
+      'name': '예레미야',
+      'englishName': 'Jeremiah',
+      'testament': 'old',
+    },
+    'Lam': {
+      'id': 25,
+      'name': '예레미야 애가',
+      'englishName': 'Lamentations',
+      'testament': 'old',
+    },
+    'Ezk': {
+      'id': 26,
+      'name': '에스겔',
+      'englishName': 'Ezekiel',
+      'testament': 'old',
+    },
+    'Dan': {
+      'id': 27,
+      'name': '다니엘',
+      'englishName': 'Daniel',
+      'testament': 'old',
+    },
+    'Hos': {
+      'id': 28,
+      'name': '호세아',
+      'englishName': 'Hosea',
+      'testament': 'old',
+    },
+    'Joe': {'id': 29, 'name': '요엘', 'englishName': 'Joel', 'testament': 'old'},
+    'Amo': {'id': 30, 'name': '아모스', 'englishName': 'Amos', 'testament': 'old'},
+    'Oba': {
+      'id': 31,
+      'name': '오바댜',
+      'englishName': 'Obadiah',
+      'testament': 'old',
+    },
+    'Jon': {'id': 32, 'name': '요나', 'englishName': 'Jonah', 'testament': 'old'},
+    'Mic': {'id': 33, 'name': '미가', 'englishName': 'Micah', 'testament': 'old'},
+    'Nam': {'id': 34, 'name': '나훔', 'englishName': 'Nahum', 'testament': 'old'},
+    'Hab': {
+      'id': 35,
+      'name': '하박국',
+      'englishName': 'Habakkuk',
+      'testament': 'old',
+    },
+    'Zep': {
+      'id': 36,
+      'name': '스바냐',
+      'englishName': 'Zechariah',
+      'testament': 'old',
+    },
+    'Hag': {
+      'id': 37,
+      'name': '학개',
+      'englishName': 'Haggai',
+      'testament': 'old',
+    },
+    'Zec': {
+      'id': 38,
+      'name': '스가랴',
+      'englishName': 'Zechariah',
+      'testament': 'old',
+    },
+    'Mal': {
+      'id': 39,
+      'name': '말라기',
+      'englishName': 'Malachi',
+      'testament': 'old',
+    },
+    'Mat': {
+      'id': 40,
+      'name': '마태복음',
+      'englishName': 'Matthew',
+      'testament': 'new',
+    },
+    'Mrk': {
+      'id': 41,
+      'name': '마가복음',
+      'englishName': 'Mark',
+      'testament': 'new',
+    },
+    'Luk': {
+      'id': 42,
+      'name': '누가복음',
+      'englishName': 'Luke',
+      'testament': 'new',
+    },
+    'Jhn': {
+      'id': 43,
+      'name': '요한복음',
+      'englishName': 'John',
+      'testament': 'new',
+    },
+    'Act': {
+      'id': 44,
+      'name': '사도행전',
+      'englishName': 'Acts',
+      'testament': 'new',
+    },
+    'Rom': {
+      'id': 45,
+      'name': '로마서',
+      'englishName': 'Romans',
+      'testament': 'new',
+    },
+    '1Co': {
+      'id': 46,
+      'name': '고린도전서',
+      'englishName': '1 Corinthians',
+      'testament': 'new',
+    },
+    '2Co': {
+      'id': 47,
+      'name': '고린도후서',
+      'englishName': '2 Corinthians',
+      'testament': 'new',
+    },
+    'Gal': {
+      'id': 48,
+      'name': '갈라디아서',
+      'englishName': 'Galatians',
+      'testament': 'new',
+    },
+    'Eph': {
+      'id': 49,
+      'name': '에베소서',
+      'englishName': 'Ephesians',
+      'testament': 'new',
+    },
+    'Php': {
+      'id': 50,
+      'name': '빌립보서',
+      'englishName': 'Philippians',
+      'testament': 'new',
+    },
+    'Col': {
+      'id': 51,
+      'name': '골로새서',
+      'englishName': 'Colossians',
+      'testament': 'new',
+    },
+    '1Th': {
+      'id': 52,
+      'name': '데살로니가전서',
+      'englishName': '1 Thessalonians',
+      'testament': 'new',
+    },
+    '2Th': {
+      'id': 53,
+      'name': '데살로니가후서',
+      'englishName': '2 Thessalonians',
+      'testament': 'new',
+    },
+    '1Ti': {
+      'id': 54,
+      'name': '디모데전서',
+      'englishName': '1 Timothy',
+      'testament': 'new',
+    },
+    '2Ti': {
+      'id': 55,
+      'name': '디모데후서',
+      'englishName': '2 Timothy',
+      'testament': 'new',
+    },
+    'Tit': {
+      'id': 56,
+      'name': '디도서',
+      'englishName': 'Titus',
+      'testament': 'new',
+    },
+    'Phm': {
+      'id': 57,
+      'name': '빌레몬서',
+      'englishName': 'Philemon',
+      'testament': 'new',
+    },
+    'Heb': {
+      'id': 58,
+      'name': '히브리서',
+      'englishName': 'Hebrews',
+      'testament': 'new',
+    },
+    'Jas': {
+      'id': 59,
+      'name': '야고보서',
+      'englishName': 'James',
+      'testament': 'new',
+    },
+    '1Pe': {
+      'id': 60,
+      'name': '베드로전서',
+      'englishName': '1 Peter',
+      'testament': 'new',
+    },
+    '2Pe': {
+      'id': 61,
+      'name': '베드로후서',
+      'englishName': '2 Peter',
+      'testament': 'new',
+    },
+    '1Jn': {
+      'id': 62,
+      'name': '요한일서',
+      'englishName': '1 John',
+      'testament': 'new',
+    },
+    '2Jn': {
+      'id': 63,
+      'name': '요한이서',
+      'englishName': '2 John',
+      'testament': 'new',
+    },
+    '3Jn': {
+      'id': 64,
+      'name': '요한삼서',
+      'englishName': '3 John',
+      'testament': 'new',
+    },
+    'Jud': {'id': 65, 'name': '유다서', 'englishName': 'Jude', 'testament': 'new'},
+    'Rev': {
+      'id': 66,
+      'name': '요한계시록',
+      'englishName': 'Revelation',
+      'testament': 'new',
+    },
   };
 
   static final RegExp _verseKeyRegex = RegExp(r'^([^\d]+)(\d+):(\d+)$');
@@ -335,5 +687,14 @@ class BibleDataParser {
     }
 
     return {'books': finalBooks};
+  }
+
+  static String? getEnglishName(int bookId) {
+    for (var meta in _bookMetadata.values) {
+      if (meta['id'] == bookId) {
+        return meta['englishName'] as String?;
+      }
+    }
+    return null;
   }
 }

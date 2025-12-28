@@ -12,6 +12,9 @@ class BibleProvider with ChangeNotifier {
   List<Map<String, dynamic>> _versions = [];
   List<Map<String, dynamic>> get versions => _versions;
 
+  String? _currentLanguageCode;
+  String? get currentLanguageCode => _currentLanguageCode;
+
   bool _isLoading = false;
   bool get isLoading => _isLoading || _bibleService.isDownloading;
 
@@ -20,8 +23,15 @@ class BibleProvider with ChangeNotifier {
     _loadVersions();
   }
 
-  Future<void> _loadVersions() async {
-    _versions = await _bibleService.getAvailableVersions();
+  Future<void> updateLanguageFilter(String languageCode) async {
+    await _loadVersions(languageCode: languageCode);
+  }
+
+  Future<void> _loadVersions({String? languageCode}) async {
+    _currentLanguageCode = languageCode;
+    _versions = await _bibleService.getAvailableVersions(
+      languageCode: languageCode,
+    );
     notifyListeners();
   }
 
@@ -45,8 +55,10 @@ class BibleProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<Map<String, dynamic>>> getAvailableVersions() async {
-    return await _bibleService.getAvailableVersions();
+  Future<List<Map<String, dynamic>>> getAvailableVersions({
+    String? languageCode,
+  }) async {
+    return await _bibleService.getAvailableVersions(languageCode: languageCode);
   }
 
   List<BibleVerse> getAllVerses() {
@@ -57,6 +69,22 @@ class BibleProvider with ChangeNotifier {
       }
     }
     return allVerses;
+  }
+
+  BibleVerse? getVerse(String bookName, int chapterNumber, int verseNumber) {
+    if (books.isEmpty) return null;
+
+    try {
+      final book = books.firstWhere(
+        (b) => b.name == bookName || b.englishName == bookName,
+      );
+      final chapter = book.chapters.firstWhere(
+        (c) => c.chapterNumber == chapterNumber,
+      );
+      return chapter.verses.firstWhere((v) => v.verseNumber == verseNumber);
+    } catch (e) {
+      return null;
+    }
   }
 
   BibleVerse? getTodayVerse() {

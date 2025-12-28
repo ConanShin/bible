@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show TimeOfDay;
+import 'package:flutter/widgets.dart';
 import '../models/user_preferences.dart';
 import '../services/local_storage_service.dart';
 import '../models/bible_book.dart';
@@ -20,34 +21,47 @@ class UserProvider with ChangeNotifier {
   bool _hasCompletedOnboarding = false;
   bool get hasCompletedOnboarding => _hasCompletedOnboarding;
 
-  Future<void> loadState(BibleProvider bibleProvider) async {
+  Future<void> loadPreferences() async {
     _isLoading = true;
     notifyListeners();
 
     _hasCompletedOnboarding = await _storage.getOnboardingStatus();
     _preferences = await _storage.getUserPreferences();
 
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> loadUserData(BibleProvider bibleProvider) async {
+    _isLoading = true;
+    notifyListeners();
+
     // Load history from SQLite
-    final historyData = await _storage.getHistory();
-    final books = bibleProvider.books;
+    try {
+      final historyData = await _storage.getHistory();
+      final books = bibleProvider.books;
 
-    _readingHistory = historyData.map((map) {
-      final bookId = map[ReadingHistoryTable.columnBookId] as int;
-      final book = books.firstWhere(
-        (b) => b.id == bookId,
-        orElse: () => books.first,
-      );
+      _readingHistory = historyData.map((map) {
+        final bookId = map[ReadingHistoryTable.columnBookId] as int;
+        // Handle case where book ID might not exist in current version if swapped
+        final book = books.firstWhere(
+          (b) => b.id == bookId,
+          orElse: () => books.first,
+        );
 
-      return ReadingHistoryItem(
-        book: book,
-        chapterNumber: map[ReadingHistoryTable.columnChapterNumber] as int,
-        verseNumber: map[ReadingHistoryTable.columnVerseNumber] as int,
-        timestamp: DateTime.parse(map[ReadingHistoryTable.columnTimestamp]),
-      );
-    }).toList();
+        return ReadingHistoryItem(
+          book: book,
+          chapterNumber: map[ReadingHistoryTable.columnChapterNumber] as int,
+          verseNumber: map[ReadingHistoryTable.columnVerseNumber] as int,
+          timestamp: DateTime.parse(map[ReadingHistoryTable.columnTimestamp]),
+        );
+      }).toList();
 
-    // Load bookmarks
-    _bookmarks = await _storage.getBookmarks();
+      // Load bookmarks
+      _bookmarks = await _storage.getBookmarks();
+    } catch (e) {
+      print('Error loading user data: $e');
+    }
 
     _isLoading = false;
     notifyListeners();
@@ -75,6 +89,8 @@ class UserProvider with ChangeNotifier {
       _preferences.fontSize = value;
     } else if (key == 'selectedBibleVersion') {
       _preferences.selectedBibleVersion = value;
+    } else if (key == 'appLanguage') {
+      _preferences.appLanguage = value;
     } else if (key == 'isNotificationEnabled') {
       _preferences.isNotificationEnabled = value;
     } else if (key == 'dailyNotificationTime') {
@@ -87,6 +103,12 @@ class UserProvider with ChangeNotifier {
     }
 
     // Save to disk
+    await _storage.saveUserPreferences(_preferences);
+    notifyListeners();
+  }
+
+  Future<void> updateLanguage(String lang) async {
+    _preferences.appLanguage = lang;
     await _storage.saveUserPreferences(_preferences);
     notifyListeners();
   }

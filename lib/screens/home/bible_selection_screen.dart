@@ -8,6 +8,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../utils/hangul_utils.dart';
 import 'bible_reading_screen.dart';
+import '../../l10n/app_strings.dart';
 
 class BibleSelectionScreen extends StatefulWidget {
   const BibleSelectionScreen({super.key});
@@ -146,7 +147,7 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen>
           title: AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             child: Text(
-              _getTitle(),
+              _getTitle(context.watch<UserProvider>().preferences.appLanguage),
               key: ValueKey(_step),
               style: AppTextStyles.heading3.copyWith(fontSize: 18),
             ),
@@ -195,16 +196,20 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen>
     );
   }
 
-  String _getTitle() {
+  String _getTitle(String lang) {
     switch (_step) {
       case 0:
-        return '성경 선택';
+        return AppStrings.get('bible_selection_title', lang);
       case 1:
-        return _selectedBook?.name ?? '장 선택';
+        final bookName =
+            _selectedBook?.getDisplayName(lang) ??
+            AppStrings.get('chapter_selection', lang);
+        return bookName;
       case 2:
-        return '${_selectedBook?.name} ${_selectedChapter?.chapterNumber}장';
+        final bookName = _selectedBook?.getDisplayName(lang) ?? '';
+        return '$bookName ${_selectedChapter?.chapterNumber}';
       default:
-        return '성경 선택';
+        return AppStrings.get('bible_selection_title', lang);
     }
   }
 
@@ -258,9 +263,19 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen>
             children: [
               TabBar(
                 controller: _tabController,
-                tabs: const [
-                  Tab(text: '구약성경'),
-                  Tab(text: '신약성경'),
+                tabs: [
+                  Tab(
+                    text: AppStrings.get(
+                      'old_testament',
+                      context.watch<UserProvider>().preferences.appLanguage,
+                    ),
+                  ),
+                  Tab(
+                    text: AppStrings.get(
+                      'new_testament',
+                      context.watch<UserProvider>().preferences.appLanguage,
+                    ),
+                  ),
                 ],
                 labelColor: Theme.of(context).colorScheme.onSurface,
                 unselectedLabelColor: Theme.of(
@@ -338,7 +353,10 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen>
                   });
                 },
                 decoration: InputDecoration(
-                  hintText: '성경 검색 (예: 창세, ㅊㅅㄱ)',
+                  hintText: AppStrings.get(
+                    'search_hint',
+                    context.watch<UserProvider>().preferences.appLanguage,
+                  ),
                   hintStyle: TextStyle(
                     color: Theme.of(
                       context,
@@ -377,11 +395,19 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen>
   }
 
   Widget _buildBookListView(List<BibleBook> books, Color testamentColor) {
+    final lang = context.watch<UserProvider>().preferences.appLanguage;
     return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: books.length,
       itemBuilder: (context, index) {
         final book = books[index];
+        final primaryName = book.getDisplayName(lang);
+        final initial = lang == 'ko'
+            ? book.name.substring(0, 1)
+            : book.englishName
+                  .substring(0, book.englishName.length >= 2 ? 2 : 1)
+                  .toUpperCase();
+
         return InkWell(
           onTap: () => _onBookSelected(book),
           child: Container(
@@ -396,7 +422,7 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen>
             child: Row(
               children: [
                 Container(
-                  width: 32,
+                  width: lang == 'ko' ? 32 : 40,
                   height: 32,
                   decoration: BoxDecoration(
                     color: testamentColor.withOpacity(0.1),
@@ -404,34 +430,21 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen>
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    book.name.substring(0, 1),
+                    initial,
                     style: TextStyle(
                       color: testamentColor,
                       fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                      fontSize: lang == 'ko' ? 14 : 11,
                     ),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        book.name,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        book.englishName,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withOpacity(0.4),
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    primaryName,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
                 Icon(
@@ -452,22 +465,24 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen>
   Widget _buildChapterStep() {
     if (_selectedBook == null) return const SizedBox.shrink();
 
+    final lang = context.watch<UserProvider>().preferences.appLanguage;
     return _buildGridStep(
       items: _selectedBook!.chapters,
       labelBuilder: (chapter) => '${chapter.chapterNumber}',
       onSelected: (chapter) => _onChapterSelected(chapter),
-      subtitle: '몇 장을 읽으시겠어요?',
+      subtitle: AppStrings.get('how_many_chapters', lang),
     );
   }
 
   Widget _buildVerseStep() {
     if (_selectedChapter == null) return const SizedBox.shrink();
 
+    final lang = context.watch<UserProvider>().preferences.appLanguage;
     return _buildGridStep(
       items: _selectedChapter!.verses,
       labelBuilder: (verse) => '${verse.verseNumber}',
       onSelected: (verse) => _onVerseSelected(verse.verseNumber),
-      subtitle: '몇 절부터 읽으시겠어요?',
+      subtitle: AppStrings.get('how_many_verses', lang),
     );
   }
 

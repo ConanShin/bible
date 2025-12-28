@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../theme/spacing.dart';
 import '../../providers/bible_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../models/user_preferences.dart';
+import '../../l10n/app_strings.dart';
 
 class Step2BibleSelection extends StatelessWidget {
   final VoidCallback onNext;
@@ -19,13 +19,19 @@ class Step2BibleSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+    final lang = userProvider.preferences.appLanguage;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: onBack,
         ),
-        title: Text("성경 선택", style: AppTextStyles.bodyLarge),
+        title: Text(
+          AppStrings.get('bible_selection_title', lang),
+          style: AppTextStyles.bodyLarge,
+        ),
       ),
       body: Consumer<BibleProvider>(
         builder: (context, bibleProvider, child) {
@@ -34,13 +40,40 @@ class Step2BibleSelection extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
+          // Auto-select first version if none selected or current selection is not in list
+          final userProvider = Provider.of<UserProvider>(
+            context,
+            listen: false,
+          );
+          final currentSelection =
+              userProvider.preferences.selectedBibleVersion;
+          final bool isCurrentSelectionValid = versions.any(
+            (v) => v['id'] == currentSelection,
+          );
+
+          if ((currentSelection.isEmpty || !isCurrentSelectionValid) &&
+              versions.isNotEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final latestSelection =
+                  userProvider.preferences.selectedBibleVersion;
+              final bool stillInvalid = !versions.any(
+                (v) => v['id'] == latestSelection,
+              );
+              if (latestSelection.isEmpty || stillInvalid) {
+                UserPreferences newPrefs = userProvider.preferences;
+                newPrefs.selectedBibleVersion = versions.first['id'];
+                userProvider.updatePreferences(newPrefs);
+              }
+            });
+          }
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 child: Text(
-                  "어떤 성경 번역본을\n선호하시나요?",
+                  AppStrings.get('bible_selection_question', lang),
                   style: AppTextStyles.heading2,
                 ),
               ),
@@ -54,9 +87,15 @@ class Step2BibleSelection extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final version = versions[index];
                     final String versionId = version['id'];
-                    final String versionName = version['name'];
+                    final String versionName = lang == 'ko'
+                        ? version['name']
+                        : (version['englishName'] ?? version['name']);
                     final String description =
-                        version['description'] ?? "설명이 없습니다.";
+                        version['description'] ??
+                        AppStrings.get(
+                          'no_description',
+                          userProvider.preferences.appLanguage,
+                        );
 
                     return Consumer<UserProvider>(
                       builder: (context, userProvider, _) {
@@ -148,21 +187,38 @@ class Step2BibleSelection extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton(
-                    onPressed: onNext,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusMd,
+                child: Consumer<UserProvider>(
+                  builder: (context, userProvider, _) {
+                    final isSelected = userProvider
+                        .preferences
+                        .selectedBibleVersion
+                        .isNotEmpty;
+
+                    return SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: isSelected ? onNext : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).primaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusMd,
+                            ),
+                          ),
+                          textStyle: AppTextStyles.bodyNormal.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        child: Text(
+                          AppStrings.get(
+                            'next',
+                            userProvider.preferences.appLanguage,
+                          ),
                         ),
                       ),
-                    ),
-                    child: const Text("다음"),
-                  ),
+                    );
+                  },
                 ),
               ),
             ],

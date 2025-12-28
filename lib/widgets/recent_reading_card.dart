@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../models/reading_history_item.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
+import '../l10n/app_strings.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_provider.dart';
 
 import '../screens/home/bible_reading_screen.dart';
 
@@ -12,6 +15,7 @@ class RecentReadingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = context.watch<UserProvider>().preferences.appLanguage;
     final isOldTestament = item.book.testament == 'old';
 
     // Use lighter colors for Dark Mode visibility
@@ -73,7 +77,7 @@ class RecentReadingCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        item.book.name,
+                        item.book.getDisplayName(lang),
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -91,7 +95,7 @@ class RecentReadingCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${item.chapterNumber}장 ${item.verseNumber}절 읽음',
+                    '${item.chapterNumber} : ${item.verseNumber} ${AppStrings.get('read_label', lang)}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(
                         context,

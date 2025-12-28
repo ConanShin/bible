@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'home/home_screen.dart';
 import 'search/search_screen.dart';
 import 'bookmarks/bookmarks_screen.dart';
 import 'settings/settings_screen.dart';
+import '../providers/user_provider.dart';
+import '../l10n/app_strings.dart';
 
 class MainApp extends StatefulWidget {
   const MainApp({super.key});
@@ -48,11 +51,14 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+    final lang = userProvider.preferences.appLanguage;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '심플 성경',
-          style: TextStyle(fontWeight: FontWeight.w100),
+        title: Text(
+          AppStrings.get('app_title', lang),
+          style: const TextStyle(fontWeight: FontWeight.w100),
         ),
         elevation: 1,
         // backgroundColor: Colors.white, // Removed to support dark mode
@@ -76,11 +82,23 @@ class _MainAppState extends State<MainApp> {
           context,
         ).colorScheme.onSurface.withOpacity(0.4),
         showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: '읽기'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: '검색'),
-          BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: '북마크'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: '설정'),
+        items: [
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.menu_book),
+            label: AppStrings.get('nav_read', lang),
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.search),
+            label: AppStrings.get('nav_search', lang),
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.bookmark),
+            label: AppStrings.get('bookmarks', lang),
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.settings),
+            label: AppStrings.get('settings', lang),
+          ),
         ],
       ),
     );

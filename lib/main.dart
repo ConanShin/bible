@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'theme/app_theme.dart';
@@ -49,15 +50,25 @@ class _AppRootState extends State<AppRoot> {
     super.initState();
     // Load initial data
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userProvider = context.read<UserProvider>();
       final bibleProvider = context.read<BibleProvider>();
-      bibleProvider.loadBibleData().then((_) {
-        context.read<UserProvider>().loadState(bibleProvider).then((_) {
-          // Sync theme with loaded preferences
-          final userProvider = context.read<UserProvider>();
-          context.read<ThemeProvider>().setDarkMode(
-            userProvider.preferences.isDarkMode,
-          );
-        });
+
+      // 1. Load preferences first (to get selected language/version)
+      userProvider.loadPreferences().then((_) {
+        // Build correct provider based on loaded preferences
+        context.read<ThemeProvider>().setDarkMode(
+          userProvider.preferences.isDarkMode,
+        );
+
+        // 2. Load Bible data with the SAVED version
+        bibleProvider
+            .loadBibleData(
+              version: userProvider.preferences.selectedBibleVersion,
+            )
+            .then((_) {
+              // 3. Load user data (history/bookmarks) that depends on Bible data
+              userProvider.loadUserData(bibleProvider);
+            });
       });
     });
   }
@@ -78,6 +89,13 @@ class _AppRootState extends State<AppRoot> {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      locale: Locale(userProvider.preferences.appLanguage),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en'), Locale('ko')],
       home: userProvider.hasCompletedOnboarding
           ? const MainApp()
           : const OnboardingScreen(),

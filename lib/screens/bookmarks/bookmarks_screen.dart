@@ -5,6 +5,7 @@ import '../../providers/bible_provider.dart';
 import '../../models/bookmark.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
+import '../../l10n/app_strings.dart';
 import '../home/bible_reading_screen.dart';
 
 class BookmarksScreen extends StatelessWidget {
@@ -34,7 +35,10 @@ class BookmarksScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '저장된 북마크가 없습니다.',
+                    AppStrings.get(
+                      'no_bookmarks',
+                      userProvider.preferences.appLanguage,
+                    ),
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Theme.of(
                         context,
@@ -81,19 +85,27 @@ class _BookmarkItemState extends State<_BookmarkItem> {
     String displayVerseText = widget.bookmark.verseText;
 
     // Try to get text from current version
-    try {
-      final book = bibleProvider.books.firstWhere(
-        (b) => b.name == widget.bookmark.bookName,
-      );
-      final chapter = book.chapters.firstWhere(
-        (c) => c.chapterNumber == widget.bookmark.chapterNumber,
-      );
-      final verse = chapter.verses.firstWhere(
-        (v) => v.verseNumber == widget.bookmark.verseNumber,
-      );
-      displayVerseText = verse.text;
-    } catch (_) {
-      // Fallback to stored text if not found in current version
+    final lang = context.watch<UserProvider>().preferences.appLanguage;
+    String displayBookName = widget.bookmark.bookName;
+
+    final currentVerse = bibleProvider.getVerse(
+      widget.bookmark.bookName,
+      widget.bookmark.chapterNumber,
+      widget.bookmark.verseNumber,
+    );
+
+    if (currentVerse != null) {
+      displayVerseText = currentVerse.text;
+
+      // Also ensure book name is localized
+      try {
+        final book = bibleProvider.books.firstWhere(
+          (b) =>
+              b.name == widget.bookmark.bookName ||
+              b.englishName == widget.bookmark.bookName,
+        );
+        displayBookName = book.getDisplayName(lang);
+      } catch (_) {}
     }
 
     return Dismissible(
@@ -110,15 +122,16 @@ class _BookmarkItemState extends State<_BookmarkItem> {
         child: const Icon(Icons.delete_outline, color: Colors.white, size: 28),
       ),
       confirmDismiss: (direction) async {
+        final lang = context.read<UserProvider>().preferences.appLanguage;
         return await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('북마크 삭제'),
-            content: const Text('이 북마크를 삭제하시겠습니까?'),
+            title: Text(AppStrings.get('delete_bookmark_title', lang)),
+            content: Text(AppStrings.get('delete_bookmark_confirm', lang)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('취소'),
+                child: Text(AppStrings.get('cancel', lang)),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context, true),
@@ -126,7 +139,7 @@ class _BookmarkItemState extends State<_BookmarkItem> {
                   backgroundColor: Theme.of(context).colorScheme.error,
                   foregroundColor: Colors.white,
                 ),
-                child: const Text('삭제'),
+                child: Text(AppStrings.get('delete', lang)),
               ),
             ],
           ),
@@ -134,9 +147,10 @@ class _BookmarkItemState extends State<_BookmarkItem> {
       },
       onDismissed: (direction) {
         context.read<UserProvider>().deleteBookmarkById(widget.bookmark.id);
+        final lang = context.read<UserProvider>().preferences.appLanguage;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('북마크가 삭제되었습니다.'),
+            content: Text(AppStrings.get('bookmark_deleted', lang)),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
@@ -187,7 +201,7 @@ class _BookmarkItemState extends State<_BookmarkItem> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            '${widget.bookmark.bookName} ${widget.bookmark.chapterNumber}:${widget.bookmark.verseNumber}',
+                            '$displayBookName ${widget.bookmark.chapterNumber}:${widget.bookmark.verseNumber}',
                             style: Theme.of(context).textTheme.bodyLarge
                                 ?.copyWith(fontWeight: FontWeight.w700),
                           ),
@@ -304,7 +318,21 @@ class _BookmarkItemState extends State<_BookmarkItem> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      _isExpanded ? '접기' : '전체 보기',
+                                      _isExpanded
+                                          ? AppStrings.get(
+                                              'fold',
+                                              context
+                                                  .read<UserProvider>()
+                                                  .preferences
+                                                  .appLanguage,
+                                            )
+                                          : AppStrings.get(
+                                              'view_all',
+                                              context
+                                                  .read<UserProvider>()
+                                                  .preferences
+                                                  .appLanguage,
+                                            ),
                                       style: Theme.of(context)
                                           .textTheme
                                           .labelSmall
@@ -349,10 +377,13 @@ class _BookmarkItemState extends State<_BookmarkItem> {
   }
 
   void _navigateToVerse(BuildContext context) {
+    final lang = context.read<UserProvider>().preferences.appLanguage;
     try {
       final bibleProvider = context.read<BibleProvider>();
       final book = bibleProvider.books.firstWhere(
-        (b) => b.name == widget.bookmark.bookName,
+        (b) =>
+            b.name == widget.bookmark.bookName ||
+            b.englishName == widget.bookmark.bookName,
       );
       final chapter = book.chapters.firstWhere(
         (c) => c.chapterNumber == widget.bookmark.chapterNumber,
@@ -369,9 +400,9 @@ class _BookmarkItemState extends State<_BookmarkItem> {
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('해당 구절을 찾을 수 없습니다.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.get('verse_not_found', lang))),
+      );
     }
   }
 

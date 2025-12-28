@@ -34,6 +34,7 @@ class BibleService extends ChangeNotifier {
       if (localData.isNotEmpty) {
         _books = localData;
         _currentVersion = targetVersion;
+        _sanitizeBooks(); // Auto-correct any corrupted English names in cache
         _logger.i('Loaded Bible data from Local Storage: $targetVersion');
         notifyListeners();
         return _books;
@@ -59,11 +60,35 @@ class BibleService extends ChangeNotifier {
       _books = booksList.map((i) => BibleBook.fromJson(i)).toList();
       _versions = {'versions': data['bibleVersions']};
 
+      _sanitizeBooks();
+
       notifyListeners();
       return _books;
     } catch (e) {
       _logger.e("Error loading bible data from assets: $e");
       return [];
+    }
+  }
+
+  void _sanitizeBooks() {
+    for (var i = 0; i < _books.length; i++) {
+      final book = _books[i];
+      final correctEnglishName = BibleDataParser.getEnglishName(book.id);
+
+      // Overwrite if englishName is invalid (contains Korean or doesn't match metadata)
+      // We strictly enforce metadata English name to ensure it is English.
+      if (correctEnglishName != null &&
+          book.englishName != correctEnglishName) {
+        _books[i] = BibleBook(
+          id: book.id,
+          name: book.name,
+          englishName: correctEnglishName,
+          abbreviation: book.abbreviation,
+          testament: book.testament,
+          totalChapters: book.totalChapters,
+          chapters: book.chapters,
+        );
+      }
     }
   }
 
@@ -155,11 +180,10 @@ class BibleService extends ChangeNotifier {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getAvailableVersions() async {
-    // If we have versions from asset/metadata, use them.
-    if (_versions != null && _versions!['versions'] != null) {
-      return List<Map<String, dynamic>>.from(_versions!['versions']);
-    }
+  Future<List<Map<String, dynamic>>> getAvailableVersions({
+    String? languageCode,
+  }) async {
+    List<Map<String, dynamic>> versions = [];
 
     // Try to load from assets if not loaded yet
     try {
@@ -169,58 +193,117 @@ class BibleService extends ChangeNotifier {
       final data = await json.decode(response);
       _versions = {'versions': data['bibleVersions']};
       if (_versions != null && _versions!['versions'] != null) {
-        return List<Map<String, dynamic>>.from(_versions!['versions']);
+        versions = List<Map<String, dynamic>>.from(_versions!['versions']);
       }
     } catch (e) {
       _logger.e("Error loading versions from assets: $e");
     }
 
-    // Fallback/Default supported versions
-    return [
-      {
-        'id': 'krv',
-        'name': '개역개정',
-        'description':
-            '한국교회 표준 성경. 1961년 개역한글을 현대어로 대폭 개정. 문법/맞춤법 현대화, 오역 수정, 72,712곳 수정.',
-        'url':
-            'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_krv.json',
-      },
-      {
-        'id': 'snkv',
-        'name': '새번역',
-        'description': '일상어 중심의 현대적 번역. 이해하기 쉬운 표현, 청소년/일반인 대상.',
-        'url':
-            'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_snkv.json',
-      },
-      {
-        'id': 'ncv',
-        'name': '표준새번역',
-        'description': '새번역의 정확성/표준성 강화. 현대어 유지하면서 원문 충실도 높임.',
-        'url':
-            'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_ncv.json',
-      },
-      {
-        'id': 'ksv',
-        'name': '개역한글',
-        'description': '1938년 개역판을 한글맞춤법 통일안에 맞춰 개정. 문어체 스타일 유지, 보수 교회 선호.',
-        'url':
-            'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_ksv.json',
-      },
-      {
-        'id': 'kcb',
-        'name': '공동번역',
-        'description': '가톨릭/개신교 공동 번역. 생태계/평등 용어 현대화, 교파 간 통합 목적.',
-        'url':
-            'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_kcb.json',
-      },
-      {
-        'id': 'kcb2',
-        'name': '공동번역 개정',
-        'description': '공동번역의 문체/표현 최신화. 가톨릭-개신교 사용 지속.',
-        'url':
-            'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_kcb2.json',
-      },
-    ];
+    if (versions.isEmpty) {
+      // Fallback/Default supported versions
+      versions = [
+        // Korean Versions
+        {
+          'id': 'krv',
+          'language': 'ko',
+          'name': '개역개정',
+          'description': '한국교회 표준 성경. 1961년 개역한글을 현대어로 대폭 개정.',
+          'url':
+              'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_krv_ko.json',
+        },
+        {
+          'id': 'snkv',
+          'language': 'ko',
+          'name': '새번역',
+          'description': '일상어 중심의 현대적 번역. 이해하기 쉬운 표현.',
+          'url':
+              'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_snkv_ko.json',
+        },
+        {
+          'id': 'ncv',
+          'language': 'ko',
+          'name': '표준새번역',
+          'description': '새번역의 정확성/표준성 강화. 현대어 유지하면서 원문 충실도 높임.',
+          'url':
+              'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_ncv_ko.json',
+        },
+        {
+          'id': 'ksv',
+          'language': 'ko',
+          'name': '개역한글',
+          'description': '1938년 개역판을 한글맞춤법 통일안에 맞춰 개정. 문어체 스타일 유지.',
+          'url':
+              'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_ksv_ko.json',
+        },
+        {
+          'id': 'kcb',
+          'language': 'ko',
+          'name': '공동번역',
+          'description': '가톨릭/개신교 공동 번역. 생태계/평등 용어 현대화.',
+          'url':
+              'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_kcb_ko.json',
+        },
+        // English Versions
+        {
+          'id': 'niv',
+          'language': 'en',
+          'name': 'NIV',
+          'description':
+              'New International Version. A balance of accuracy and readability.',
+          'url':
+              'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_niv_en.json',
+        },
+        {
+          'id': 'esv',
+          'language': 'en',
+          'name': 'ESV',
+          'description': 'English Standard Version. Word-for-word translation.',
+          'url':
+              'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_esv_en.json',
+        },
+        {
+          'id': 'nkjv',
+          'language': 'en',
+          'name': 'NKJV',
+          'description':
+              'New King James Version. Modern language based on KJV.',
+          'url':
+              'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_nkjv_en.json',
+        },
+        {
+          'id': 'nlt',
+          'language': 'en',
+          'name': 'NLT',
+          'description':
+              'New Living Translation. Easy to understand, thought-for-thought.',
+          'url':
+              'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_nlt_en.json',
+        },
+        {
+          'id': 'nasb',
+          'language': 'en',
+          'name': 'NASB',
+          'description':
+              'New American Standard Bible. Highly literal translation.',
+          'url':
+              'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_nasb_en.json',
+        },
+        {
+          'id': 'kjv',
+          'language': 'en',
+          'name': 'KJV',
+          'description': 'King James Version. Classic English translation.',
+          'url':
+              'https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_kjv_en.json',
+        },
+      ];
+    }
+
+    if (languageCode != null) {
+      return versions.where((v) => v['language'] == languageCode).toList();
+    }
+
+    return versions;
   }
 
   Future<List<BibleVerse>> searchVerses(String keyword) async {

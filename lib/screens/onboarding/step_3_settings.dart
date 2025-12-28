@@ -6,6 +6,7 @@ import '../../theme/spacing.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../models/user_preferences.dart';
+import '../../l10n/app_strings.dart';
 
 class Step3Settings extends StatelessWidget {
   final VoidCallback onBack;
@@ -25,17 +26,24 @@ class Step3Settings extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: onBack,
         ),
-        title: Text("설정", style: AppTextStyles.bodyLarge),
+        title: Text(
+          AppStrings.get(
+            'settings',
+            context.watch<UserProvider>().preferences.appLanguage,
+          ),
+          style: AppTextStyles.bodyLarge,
+        ),
       ),
       body: Consumer<UserProvider>(
         builder: (context, userProvider, _) {
+          final lang = userProvider.preferences.appLanguage;
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "읽기 경험 설정",
+                  AppStrings.get('reading_settings', lang),
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -44,7 +52,7 @@ class Step3Settings extends StatelessWidget {
 
                 // Font Size Slider
                 Text(
-                  "글자 크기",
+                  AppStrings.get('font_size', lang),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -53,15 +61,15 @@ class Step3Settings extends StatelessWidget {
                 const SizedBox(height: AppSpacing.sm),
                 Row(
                   children: [
-                    Text("가", style: Theme.of(context).textTheme.bodySmall),
+                    const Icon(Icons.text_fields, size: 16),
                     Expanded(
                       child: Slider(
                         value: userProvider.preferences.fontSize,
                         min: 12.0,
-                        max: 24.0,
-                        divisions: 6,
+                        max: 30.0,
                         activeColor: Theme.of(context).primaryColor,
-                        label: userProvider.preferences.fontSize.toString(),
+                        label: userProvider.preferences.fontSize
+                            .toStringAsFixed(0),
                         onChanged: (value) {
                           UserPreferences newPrefs = userProvider.preferences;
                           newPrefs.fontSize = value;
@@ -69,11 +77,7 @@ class Step3Settings extends StatelessWidget {
                         },
                       ),
                     ),
-                    Text(
-                      "가",
-                      style: Theme.of(context).textTheme.headlineMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
-                    ),
+                    const Icon(Icons.text_fields, size: 24),
                   ],
                 ),
 
@@ -84,7 +88,7 @@ class Step3Settings extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "야간 모드",
+                      AppStrings.get('night_mode', lang),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -108,7 +112,7 @@ class Step3Settings extends StatelessWidget {
 
                 // Notification (Simple Toggle)
                 Text(
-                  "자동 진행 (선택사항)",
+                  AppStrings.get('auto_advance', lang),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(
                       context,
@@ -123,7 +127,7 @@ class Step3Settings extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "매일 알림 받기",
+                          AppStrings.get('daily_notification', lang),
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(
                                 fontSize: 16,
@@ -131,7 +135,7 @@ class Step3Settings extends StatelessWidget {
                               ),
                         ),
                         Text(
-                          "${userProvider.preferences.dailyNotificationTime.format(context)}에 알림",
+                          "${userProvider.preferences.dailyNotificationTime.format(context)} ${AppStrings.get('notification_time_at', lang)}",
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 color: Theme.of(
@@ -156,7 +160,7 @@ class Step3Settings extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: AppSpacing.md),
                     child: OutlinedButton(
-                      child: const Text("시간 변경"),
+                      child: Text(AppStrings.get('change_time', lang)),
                       onPressed: () async {
                         final TimeOfDay? picked = await showTimePicker(
                           context: context,
@@ -186,8 +190,13 @@ class Step3Settings extends StatelessWidget {
                           AppSpacing.radiusMd,
                         ),
                       ),
+                      textStyle: AppTextStyles.bodyNormal.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    child: const Text("설정 완료 & 시작"),
+                    child: Text(
+                      AppStrings.get('settings_complete_start', lang),
+                    ),
                   ),
                 ),
               ],

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../models/bible_verse.dart';
 import '../../providers/bible_provider.dart';
 import '../../providers/user_provider.dart';
+import '../../l10n/app_strings.dart';
 import '../home/bible_reading_screen.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -80,10 +81,14 @@ class _SearchScreenState extends State<SearchScreen>
     // 1. Find BibleBook object
     final bibleProvider = Provider.of<BibleProvider>(context, listen: false);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final lang = userProvider.preferences.appLanguage;
 
     try {
+      // Find by bookName (which might be Korean or English depending on how it was stored/parsed)
+      // Actually, BibleVerse.bookName usually comes from the parser.
+      // A more robust way is to match by name or englishName.
       final book = bibleProvider.books.firstWhere(
-        (b) => b.name == verse.bookName,
+        (b) => b.name == verse.bookName || b.englishName == verse.bookName,
       );
 
       // 2. Add to History
@@ -108,7 +113,7 @@ class _SearchScreenState extends State<SearchScreen>
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('성경 데이터를 불러오는 중 오류가 발생했습니다.')),
+        SnackBar(content: Text(AppStrings.get('error_loading_bible', lang))),
       );
     }
   }
@@ -166,7 +171,10 @@ class _SearchScreenState extends State<SearchScreen>
               controller: _searchController,
               style: Theme.of(context).textTheme.bodyLarge,
               decoration: InputDecoration(
-                hintText: '검색어를 입력하세요 (예: 하나님 사랑)',
+                hintText: AppStrings.get(
+                  'search_hint',
+                  userProvider.preferences.appLanguage,
+                ),
                 hintStyle: TextStyle(color: Theme.of(context).hintColor),
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: IconButton(
@@ -190,7 +198,10 @@ class _SearchScreenState extends State<SearchScreen>
                 ? _searchResults.isEmpty
                       ? Center(
                           child: Text(
-                            '검색 결과가 없습니다.',
+                            AppStrings.get(
+                              'no_search_results',
+                              userProvider.preferences.appLanguage,
+                            ),
                             style: TextStyle(
                               fontSize: 16,
                               color: Theme.of(
@@ -215,13 +226,40 @@ class _SearchScreenState extends State<SearchScreen>
                               ),
                               color: Theme.of(context).cardColor,
                               child: ListTile(
-                                title: Text(
-                                  '${verse.bookName} ${verse.chapterNumber}:${verse.verseNumber}',
-                                  style: Theme.of(context).textTheme.titleMedium
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Consumer<BibleProvider>(
+                                      builder: (context, bibleProvider, _) {
+                                        final lang = userProvider
+                                            .preferences
+                                            .appLanguage;
+                                        String bookDisplay = verse.bookName;
+                                        try {
+                                          final book = bibleProvider.books
+                                              .firstWhere(
+                                                (b) =>
+                                                    b.name == verse.bookName ||
+                                                    b.englishName ==
+                                                        verse.bookName,
+                                              );
+                                          bookDisplay = book.getDisplayName(
+                                            lang,
+                                          );
+                                        } catch (_) {}
+                                        return Text(
+                                          '$bookDisplay ${verse.chapterNumber}:${verse.verseNumber}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14,
+                                              ),
+                                        );
+                                      },
+                                    ),
+                                  ],
                                 ),
                                 subtitle: Padding(
                                   padding: const EdgeInsets.only(top: 4.0),
@@ -261,7 +299,10 @@ class _SearchScreenState extends State<SearchScreen>
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          '성경 구절을 검색해보세요',
+                          AppStrings.get(
+                            'search_initial_message',
+                            userProvider.preferences.appLanguage,
+                          ),
                           style: Theme.of(context).textTheme.bodyLarge
                               ?.copyWith(
                                 color: Theme.of(

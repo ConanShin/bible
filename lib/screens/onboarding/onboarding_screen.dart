@@ -4,8 +4,10 @@ import '../main_app.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
+import '../../providers/bible_provider.dart';
 import '../../theme/spacing.dart';
 import 'step_1_welcome.dart';
+import 'step_0_language_selection.dart';
 import 'step_2_bible_selection.dart';
 import 'step_3_settings.dart';
 
@@ -48,7 +50,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     if (success == true && mounted) {
       await userProvider.completeOnboarding();
-      
+
       if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const MainApp()),
@@ -78,6 +80,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
                 children: [
                   Step1Welcome(onNext: _nextPage),
+                  Step0LanguageSelection(
+                    onLanguageSelected: (lang) {
+                      context.read<BibleProvider>().updateLanguageFilter(lang);
+                      _nextPage();
+                    },
+                  ),
                   Step2BibleSelection(onNext: _nextPage, onBack: _prevPage),
                   Step3Settings(
                     onBack: _prevPage,
@@ -88,13 +96,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
 
             // Page Indicator
-            if (_currentPage <
-                2) // Hide on settings screen ? Or keep it. Design says 3 dots.
+            if (_currentPage < 3)
               Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.xl),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(3, (index) {
+                  children: List.generate(4, (index) {
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       margin: const EdgeInsets.symmetric(horizontal: 4),

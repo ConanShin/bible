@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import '../screens/home/bible_selection_screen.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_text_styles.dart';
+import '../l10n/app_strings.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_provider.dart';
 
 class NewBookStartCard extends StatelessWidget {
   const NewBookStartCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final lang = context.watch<UserProvider>().preferences.appLanguage;
+
     return GestureDetector(
       onTap: () {
         showModalBottomSheet(
@@ -24,12 +27,10 @@ class NewBookStartCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
-          // Remove gradient or use a subtle warm one if preferred, but plain cardColor matches theme better
-          // If a distinctive look is needed, use a very subtle warm gradient
           gradient: LinearGradient(
             colors: [
               Theme.of(context).cardColor,
-              Theme.of(context).cardColor.withOpacity(0.9), // Subtle variation
+              Theme.of(context).cardColor.withOpacity(0.9),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -69,13 +70,13 @@ class NewBookStartCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "성경 선택",
+                    AppStrings.get('select_bible_card_title', lang),
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    "은혜로운 첫 장을 열어보세요",
+                    AppStrings.get('select_bible_card_subtitle', lang),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(
                         context,

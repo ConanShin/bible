@@ -3,10 +3,10 @@ import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/bible_provider.dart';
-import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../widgets/download_progress_dialog.dart';
 import 'package:logger/logger.dart';
+import '../../l10n/app_strings.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 import '../onboarding/onboarding_screen.dart';
@@ -35,15 +35,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final userProvider = context.watch<UserProvider>();
     final themeProvider = context.watch<ThemeProvider>();
     final preferences = userProvider.preferences;
+    final lang = preferences.appLanguage;
 
     return Scaffold(
       body: ListView(
         children: [
-          _buildSectionTitle('읽기 설정'),
+          _buildSectionTitle(AppStrings.get('reading_settings', lang)),
 
           // Font Size
           ListTile(
-            title: const Text('글자 크기'),
+            title: Text(AppStrings.get('font_size', lang)),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -77,7 +78,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             final firstVerse = firstChapter.verses.first;
                             previewText = firstVerse.text;
                             previewRef =
-                                '${firstBook.name} ${firstChapter.chapterNumber}:${firstVerse.verseNumber}';
+                                '${firstBook.getDisplayName(lang)} ${firstChapter.chapterNumber}:${firstVerse.verseNumber}';
                           }
                         }
                       }
@@ -128,7 +129,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Dark Mode
           SwitchListTile(
-            title: const Text('야간 모드'),
+            title: Text(AppStrings.get('night_mode', lang)),
             value: preferences.isDarkMode,
             onChanged: (value) {
               userProvider.savePreference('isDarkMode', value);
@@ -138,7 +139,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Bible Version Selector
           ListTile(
-            title: const Text('성경 버전'),
+            title: Text(AppStrings.get('bible_selection_title', lang)),
             subtitle: Text(
               _getVersionName(context, preferences.selectedBibleVersion),
             ),
@@ -147,23 +148,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
 
           const Divider(),
-          _buildSectionTitle('앱 설정'),
+          _buildSectionTitle(AppStrings.get('app_settings', lang)),
 
-          // Language (Placeholder)
+          // Language
           ListTile(
-            title: const Text('언어'),
-            subtitle: const Text('한국어'),
+            title: Text(AppStrings.get('select_language', lang)),
+            subtitle: Text(preferences.appLanguage == 'ko' ? '한국어' : 'English'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('다국어 지원 준비 중입니다.')));
-            },
+            onTap: () => _showLanguageSelector(context),
           ),
 
           // Notifications
           SwitchListTile(
-            title: const Text('일일 알림'),
+            title: Text(AppStrings.get('daily_notification', lang)),
             value: preferences.isNotificationEnabled,
             onChanged: (value) {
               userProvider.savePreference('isNotificationEnabled', value);
@@ -172,7 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           if (preferences.isNotificationEnabled)
             ListTile(
-              title: const Text('알림 시간'),
+              title: Text(AppStrings.get('notification_time', lang)),
               trailing: Text(preferences.dailyNotificationTime.format(context)),
               onTap: () async {
                 final picked = await showTimePicker(
@@ -189,17 +186,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
 
           const Divider(),
-          _buildSectionTitle('기타'),
-
-          ListTile(title: const Text('앱 버전'), trailing: const Text('1.0.0')),
+          _buildSectionTitle(AppStrings.get('etc', lang)),
 
           ListTile(
-            title: const Text('피드백 보내기'),
+            title: Text(AppStrings.get('app_version', lang)),
+            trailing: const Text('1.0.0'),
+          ),
+
+          ListTile(
+            title: Text(AppStrings.get('send_feedback', lang)),
             onTap: () async {
               final Uri emailLaunchUri = Uri(
                 scheme: 'mailto',
                 path: 'cheolmin.conan.shin@gmail.com',
-                query: encodeQueryParameters({'subject': '[성경 앱 피드백]'}),
+                query: encodeQueryParameters({
+                  'subject': '[${AppStrings.get('feedback_subject', lang)}]',
+                }),
               );
 
               try {
@@ -226,12 +228,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           ListTile(
             title: Text(
-              '앱 초기화',
+              AppStrings.get('reset_app', lang),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.error,
               ),
             ),
-            subtitle: const Text('모든 데이터가 삭제되고 초기 상태로 돌아갑니다.'),
+            subtitle: Text(AppStrings.get('reset_app_sub', lang)),
             onTap: () => _showResetConfirmation(context),
           ),
 
@@ -244,28 +246,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _showResetConfirmation(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('앱 초기화'),
-        content: const Text(
-          '정말 초기화하시겠습니까?\n\n'
-          '다운로드한 성경, 즐겨찾기, 읽기 기록 등\n'
-          '모든 데이터가 영구적으로 삭제됩니다.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-              foregroundColor: Colors.white,
+      builder: (context) {
+        final lang = context.watch<UserProvider>().preferences.appLanguage;
+        return AlertDialog(
+          title: Text(AppStrings.get('reset_confirm_title', lang)),
+          content: Text(AppStrings.get('reset_confirm_content', lang)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(AppStrings.get('cancel', lang)),
             ),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('초기화'),
-          ),
-        ],
-      ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(AppStrings.get('reset_app', lang)),
+            ),
+          ],
+        );
+      },
     );
 
     if (confirmed == true && context.mounted) {
@@ -302,12 +303,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Future<void> _showBibleVersionSelector(BuildContext context) async {
+  Future<void> _showBibleVersionSelector(
+    BuildContext context, {
+    String? languageCode,
+  }) async {
     final userProvider = context.read<UserProvider>();
     final bibleProvider = context.read<BibleProvider>();
     final currentVersion = userProvider.preferences.selectedBibleVersion;
+    final targetLanguage = languageCode ?? userProvider.preferences.appLanguage;
 
-    final versions = await bibleProvider.getAvailableVersions();
+    // Get versions filtered by target language
+    final versions = await bibleProvider.getAvailableVersions(
+      languageCode: targetLanguage,
+    );
 
     if (!mounted) return;
 
@@ -318,8 +326,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: versions.map((v) {
+              final String versionName = targetLanguage == 'ko'
+                  ? v['name']!
+                  : (v['englishName'] ?? v['name']!);
               return ListTile(
-                title: Text(v['name']!),
+                title: Text(versionName),
                 trailing: currentVersion == v['id']
                     ? Icon(Icons.check, color: Theme.of(context).primaryColor)
                     : null,
@@ -332,7 +343,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
 
     if (selected != null && selected != currentVersion) {
-      _onBibleVersionChanged(selected);
+      await _onBibleVersionChanged(selected);
     }
   }
 
@@ -346,7 +357,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         (v) => v['id'] == versionId,
         orElse: () => {'name': versionId},
       );
-      return version['name'];
+      final lang = context.read<UserProvider>().preferences.appLanguage;
+      return lang == 'ko'
+          ? version['name']
+          : (version['englishName'] ?? version['name']);
     } catch (e) {
       return versionId;
     }
@@ -357,20 +371,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('성경 버전 변경'),
-        content: Text('$versionName 버전을 다운로드하시겠습니까?\n네트워크 연결이 필요합니다.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+      builder: (context) {
+        final lang = context.watch<UserProvider>().preferences.appLanguage;
+        return AlertDialog(
+          title: Text(AppStrings.get('change_version_title', lang)),
+          content: Text(
+            "${versionName} ${AppStrings.get('change_version_content', lang)}",
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('다운로드'),
-          ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(AppStrings.get('cancel', lang)),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(AppStrings.get('download', lang)),
+            ),
+          ],
+        );
+      },
     );
 
     if (confirmed == true) {
@@ -391,9 +410,107 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await bibleProvider.loadBibleData(version: newVersion);
 
         if (mounted) {
+          final lang = context.read<UserProvider>().preferences.appLanguage;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('성경 버전이 성공적으로 변경되었습니다.')),
+            SnackBar(
+              content: Text(AppStrings.get('bible_version_changed', lang)),
+            ),
           );
+        }
+      }
+    }
+  }
+
+  Future<void> _showLanguageSelector(BuildContext context) async {
+    final userProvider = context.read<UserProvider>();
+    final currentLanguage = userProvider.preferences.appLanguage;
+
+    final String? selected = await showModalBottomSheet<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: const Text('한국어'),
+                subtitle: const Text('Korean'),
+                trailing: currentLanguage == 'ko'
+                    ? Icon(Icons.check, color: Theme.of(context).primaryColor)
+                    : null,
+                onTap: () => Navigator.pop(context, 'ko'),
+              ),
+              ListTile(
+                title: const Text('English'),
+                subtitle: const Text('영어'),
+                trailing: currentLanguage == 'en'
+                    ? Icon(Icons.check, color: Theme.of(context).primaryColor)
+                    : null,
+                onTap: () => Navigator.pop(context, 'en'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selected != null && selected != currentLanguage) {
+      if (mounted) {
+        // Show dialog requiring Bible version change
+        final shouldChangeBible = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) {
+            final lang = currentLanguage;
+            return AlertDialog(
+              title: Text(AppStrings.get('lang_change_confirm_title', lang)),
+              content: Text(
+                lang == 'ko'
+                    ? '언어를 영어로 변경하려면 영어 성경 버전을 선택해야 합니다.\n\n성경 버전을 선택하시겠습니까?'
+                    : 'To change the language to Korean, you must select a Korean Bible version.\n\nWould you like to select a Bible version?',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(AppStrings.get('cancel', lang)),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text(AppStrings.get('select_bible', lang)),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (shouldChangeBible == true && mounted) {
+          // Open Bible version selector and wait for selection
+          await _showBibleVersionSelector(context, languageCode: selected);
+
+          // Only update language if a new Bible version was selected
+          final newVersion = userProvider.preferences.selectedBibleVersion;
+          final bibleProvider = context.read<BibleProvider>();
+          final versions = await bibleProvider.getAvailableVersions(
+            languageCode: selected,
+          );
+
+          // Check if the current version matches the new language
+          final isVersionValid = versions.any((v) => v['id'] == newVersion);
+
+          if (isVersionValid && mounted) {
+            // Language change is complete, update the language
+            await userProvider.updateLanguage(selected);
+            // Update BibleProvider filter
+            await bibleProvider.updateLanguageFilter(selected);
+
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(AppStrings.get('lang_changed', selected)),
+                ),
+              );
+            }
+          }
         }
       }
     }

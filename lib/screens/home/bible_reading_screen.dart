@@ -8,6 +8,7 @@ import '../../providers/bible_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../models/bible_verse.dart';
 import '../../theme/app_text_styles.dart';
+import '../../l10n/app_strings.dart';
 
 class BibleReadingScreen extends StatefulWidget {
   final int bookId;
@@ -99,6 +100,14 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
 
   void _showBookmarkModal(BuildContext context, BibleVerse verse) {
     final userProvider = context.read<UserProvider>();
+    final bibleProvider = context.read<BibleProvider>();
+    final currentBook = bibleProvider.books.firstWhere(
+      (b) => b.id == widget.bookId,
+      orElse: () => bibleProvider.books.firstWhere(
+        (b) => b.name == verse.bookName || b.englishName == verse.bookName,
+        orElse: () => bibleProvider.books.first,
+      ),
+    );
     final isBookmarked = userProvider.isBookmarked(verse);
     final existingBookmark = isBookmarked
         ? userProvider.bookmarks.firstWhere(
@@ -128,7 +137,7 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${verse.bookName} ${verse.chapterNumber}:${verse.verseNumber}',
+                '${currentBook.getDisplayName(userProvider.preferences.appLanguage)} ${verse.chapterNumber}:${verse.verseNumber}',
                 style: AppTextStyles.heading3,
               ),
               const SizedBox(height: 16),
@@ -145,10 +154,13 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
               const SizedBox(height: 24),
               TextField(
                 controller: noteController,
-                decoration: const InputDecoration(
-                  hintText: '메모를 입력하세요 (선택)',
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.all(12),
+                decoration: InputDecoration(
+                  hintText: AppStrings.get(
+                    'bookmark_note_hint',
+                    userProvider.preferences.appLanguage,
+                  ),
+                  border: const OutlineInputBorder(),
+                  contentPadding: const EdgeInsets.all(12),
                 ),
                 maxLines: 3,
               ),
@@ -161,27 +173,38 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                         onPressed: () async {
                           final confirm = await showDialog<bool>(
                             context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('북마크 삭제'),
-                              content: const Text('이 북마크를 삭제하시겠습니까?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(context, false),
-                                  child: const Text('취소'),
+                            builder: (context) {
+                              final lang = userProvider.preferences.appLanguage;
+                              return AlertDialog(
+                                title: Text(
+                                  AppStrings.get('delete_bookmark_title', lang),
                                 ),
-                                ElevatedButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Theme.of(
-                                      context,
-                                    ).colorScheme.error,
-                                    foregroundColor: Colors.white,
+                                content: Text(
+                                  AppStrings.get(
+                                    'delete_bookmark_confirm',
+                                    lang,
                                   ),
-                                  child: const Text('삭제'),
                                 ),
-                              ],
-                            ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, false),
+                                    child: Text(AppStrings.get('cancel', lang)),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, true),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.error,
+                                      foregroundColor: Colors.white,
+                                    ),
+                                    child: Text(AppStrings.get('delete', lang)),
+                                  ),
+                                ],
+                              );
+                            },
                           );
 
                           if (confirm == true) {
@@ -189,7 +212,14 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                             if (context.mounted) {
                               Navigator.pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('북마크가 삭제되었습니다.')),
+                                SnackBar(
+                                  content: Text(
+                                    AppStrings.get(
+                                      'bookmark_deleted',
+                                      userProvider.preferences.appLanguage,
+                                    ),
+                                  ),
+                                ),
                               );
                             }
                           }
@@ -201,7 +231,12 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        child: const Text('삭제'),
+                        child: Text(
+                          AppStrings.get(
+                            'delete',
+                            userProvider.preferences.appLanguage,
+                          ),
+                        ),
                       ),
                     ),
                   if (isBookmarked) const SizedBox(width: 16),
@@ -215,7 +250,14 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                         );
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('북마크가 저장되었습니다.')),
+                          SnackBar(
+                            content: Text(
+                              AppStrings.get(
+                                'bookmark_saved',
+                                userProvider.preferences.appLanguage,
+                              ),
+                            ),
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -225,7 +267,12 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('저장'),
+                      child: Text(
+                        AppStrings.get(
+                          'save',
+                          userProvider.preferences.appLanguage,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -244,13 +291,14 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
 
     // Find current book and chapter objects dynamically based on ID and version
     BibleBook? currentBook;
+    final lang = context.watch<UserProvider>().preferences.appLanguage;
     try {
       currentBook = books.firstWhere((b) => b.id == widget.bookId);
     } catch (_) {
       // If book not found in current version, fallback or return error
       return Scaffold(
-        appBar: AppBar(title: const Text('오류')),
-        body: const Center(child: Text('성경 데이터를 찾을 수 없습니다.')),
+        appBar: AppBar(title: Text(AppStrings.get('error', lang))),
+        body: Center(child: Text(AppStrings.get('bible_data_not_found', lang))),
       );
     }
 
@@ -267,8 +315,10 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
 
     if (currentChapter == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('오류')),
-        body: const Center(child: Text('장 정보를 찾을 수 없습니다.')),
+        appBar: AppBar(title: Text(AppStrings.get('error', lang))),
+        body: Center(
+          child: Text(AppStrings.get('chapter_data_not_found', lang)),
+        ),
       );
     }
 
@@ -307,7 +357,7 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
         automaticallyImplyLeading: false,
         leading: null,
         title: Text(
-          '${currentBook.name} ${currentChapter.chapterNumber}장',
+          '${lang == 'ko' ? currentBook.name : currentBook.englishName} ${currentChapter.chapterNumber}',
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.bold,
@@ -433,8 +483,8 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
                       children: [
                         Text(
                           nextBook.id == currentBook.id
-                              ? '다음 장 (${nextChapter.chapterNumber}장)'
-                              : '다음 책 (${nextBook.name} 1장)',
+                              ? '${AppStrings.get('next_chapter', lang)} (${nextChapter.chapterNumber})'
+                              : '${AppStrings.get('next_book', lang)} (${nextBook.getDisplayName(lang)} 1)',
                           style: Theme.of(context).textTheme.bodyLarge
                               ?.copyWith(
                                 fontWeight: FontWeight.w600,

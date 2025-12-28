@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
-import '../../providers/bible_provider.dart';
-import '../../theme/app_text_styles.dart';
 import '../../widgets/recent_reading_card.dart';
 import '../../widgets/new_book_start_card.dart';
+import '../../l10n/app_strings.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,6 +12,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
     // final bibleProvider = context.watch<BibleProvider>(); // Not used directly here yet
+    final String appLanguage = userProvider.preferences.appLanguage;
 
     return SingleChildScrollView(
       child: Column(
@@ -33,7 +33,7 @@ class HomeScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 16, 12),
               child: Text(
-                '최근 읽은 기록',
+                AppStrings.get('recent_history_title', appLanguage),
                 style: Theme.of(context).textTheme.displaySmall?.copyWith(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,

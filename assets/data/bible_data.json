@@ -6,7 +6,8 @@
       "englishName": "Korean Revised Version",
       "abbreviation": "개역개정",
       "description": "한국교회 표준 성경. 1961년 개역한글을 현대어로 대폭 개정.",
-      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_krv.json"
+      "language": "ko",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_krv_ko.json"
     },
     {
       "id": "snkv",
@@ -14,7 +15,8 @@
       "englishName": "New Korean Version",
       "abbreviation": "새번역",
       "description": "일상어 중심의 현대적 번역. 이해하기 쉬운 표현, 청소년/일반인 대상.",
-      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_snkv.json"
+      "language": "ko",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_snkv_ko.json"
     },
     {
       "id": "ncv",
@@ -22,7 +24,8 @@
       "englishName": "New Korean Common Version",
       "abbreviation": "표준새번역",
       "description": "새번역의 정확성/표준성 강화. 현대어 유지하면서 원문 충실도 높임.",
-      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_ncv.json"
+      "language": "ko",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_ncv_ko.json"
     },
     {
       "id": "ksv",
@@ -30,7 +33,8 @@
       "englishName": "Korean Standard Version",
       "abbreviation": "개역한글",
       "description": "1938년 개역판을 한글맞춤법 통일안에 맞춰 개정. 문어체 스타일 유지, 보수 교회 선호.",
-      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_ksv.json"
+      "language": "ko",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_ksv_ko.json"
     },
     {
       "id": "kcb",
@@ -38,15 +42,62 @@
       "englishName": "Korean Common Bible",
       "abbreviation": "공동번역",
       "description": "가톨릭/개신교 공동 번역. 생태계/평등 용어 현대화, 교파 간 통합 목적.",
-      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_kcb.json"
+      "language": "ko",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_kcb_ko.json"
     },
     {
-      "id": "kcb2",
-      "name": "공동번역 개정",
-      "englishName": "Revised Korean Common Bible",
-      "abbreviation": "공동번역개정",
-      "description": "공동번역의 문체/표현 최신화. 가톨릭-개신교 사용 지속.",
-      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_kcb2.json"
+      "id": "niv",
+      "name": "NIV",
+      "englishName": "New International Version",
+      "abbreviation": "NIV",
+      "description": "New International Version. A balance of accuracy and readability.",
+      "language": "en",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_niv_en.json"
+    },
+    {
+      "id": "esv",
+      "name": "ESV",
+      "englishName": "English Standard Version",
+      "abbreviation": "ESV",
+      "description": "English Standard Version. Word-for-word translation.",
+      "language": "en",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_esv_en.json"
+    },
+    {
+      "id": "nkjv",
+      "name": "NKJV",
+      "englishName": "New King James Version",
+      "abbreviation": "NKJV",
+      "description": "New King James Version. Modern language based on KJV.",
+      "language": "en",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_nkjv_en.json"
+    },
+    {
+      "id": "nlt",
+      "name": "NLT",
+      "englishName": "New Living Translation",
+      "abbreviation": "NLT",
+      "description": "New Living Translation. Easy to understand, thought-for-thought.",
+      "language": "en",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_nlt_en.json"
+    },
+    {
+      "id": "nasb",
+      "name": "NASB",
+      "englishName": "New American Standard Bible",
+      "abbreviation": "NASB",
+      "description": "New American Standard Bible. Highly literal translation.",
+      "language": "en",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_nasb_en.json"
+    },
+    {
+      "id": "kjv",
+      "name": "KJV",
+      "englishName": "King James Version",
+      "abbreviation": "KJV",
+      "description": "King James Version. Classic English translation.",
+      "language": "en",
+      "url": "https://raw.githubusercontent.com/ConanShin/bible-crawler/main/output/bible_kjv_en.json"
     }
   ],
   "books": [
@@ -57,25 +108,349 @@
       "abbreviation": "창",
       "testament": "old",
       "totalChapters": 50,
-      "chapters": [
-        {
-          "chapterNumber": 1,
-          "verses": [
-            {
-              "verseNumber": 1,
-              "text": "태초에 하나님이 천지를 창조하시니라"
-            },
-            {
-              "verseNumber": 2,
-              "text": "땅이 혼돈하고 공허하며 흑암이 깊음 위에 있고 하나님의 영은 수면 위에 운행하시니라"
-            },
-            {
-              "verseNumber": 3,
-              "text": "하나님이 이르시되 빛이 있으라 하시니 빛이 있었고"
-            }
-          ]
-        }
-      ]
+      "chapters": []
+    },
+    {
+      "id": 2,
+      "name": "출애굽기",
+      "englishName": "Exodus",
+      "abbreviation": "출",
+      "testament": "old",
+      "totalChapters": 40,
+      "chapters": []
+    },
+    {
+      "id": 3,
+      "name": "레위기",
+      "englishName": "Leviticus",
+      "abbreviation": "레",
+      "testament": "old",
+      "totalChapters": 27,
+      "chapters": []
+    },
+    {
+      "id": 4,
+      "name": "민수기",
+      "englishName": "Numbers",
+      "abbreviation": "민",
+      "testament": "old",
+      "totalChapters": 36,
+      "chapters": []
+    },
+    {
+      "id": 5,
+      "name": "신명기",
+      "englishName": "Deuteronomy",
+      "abbreviation": "신",
+      "testament": "old",
+      "totalChapters": 34,
+      "chapters": []
+    },
+    {
+      "id": 6,
+      "name": "여호수아",
+      "englishName": "Joshua",
+      "abbreviation": "수",
+      "testament": "old",
+      "totalChapters": 24,
+      "chapters": []
+    },
+    {
+      "id": 7,
+      "name": "사사기",
+      "englishName": "Judges",
+      "abbreviation": "삿",
+      "testament": "old",
+      "totalChapters": 21,
+      "chapters": []
+    },
+    {
+      "id": 8,
+      "name": "룻기",
+      "englishName": "Ruth",
+      "abbreviation": "룻",
+      "testament": "old",
+      "totalChapters": 4,
+      "chapters": []
+    },
+    {
+      "id": 9,
+      "name": "사무엘상",
+      "englishName": "1 Samuel",
+      "abbreviation": "삼상",
+      "testament": "old",
+      "totalChapters": 31,
+      "chapters": []
+    },
+    {
+      "id": 10,
+      "name": "사무엘하",
+      "englishName": "2 Samuel",
+      "abbreviation": "삼하",
+      "testament": "old",
+      "totalChapters": 24,
+      "chapters": []
+    },
+    {
+      "id": 11,
+      "name": "열왕기상",
+      "englishName": "1 Kings",
+      "abbreviation": "왕상",
+      "testament": "old",
+      "totalChapters": 22,
+      "chapters": []
+    },
+    {
+      "id": 12,
+      "name": "열왕기하",
+      "englishName": "2 Kings",
+      "abbreviation": "왕하",
+      "testament": "old",
+      "totalChapters": 25,
+      "chapters": []
+    },
+    {
+      "id": 13,
+      "name": "역대상",
+      "englishName": "1 Chronicles",
+      "abbreviation": "대상",
+      "testament": "old",
+      "totalChapters": 29,
+      "chapters": []
+    },
+    {
+      "id": 14,
+      "name": "역대하",
+      "englishName": "2 Chronicles",
+      "abbreviation": "대하",
+      "testament": "old",
+      "totalChapters": 36,
+      "chapters": []
+    },
+    {
+      "id": 15,
+      "name": "에스라",
+      "englishName": "Ezra",
+      "abbreviation": "스",
+      "testament": "old",
+      "totalChapters": 10,
+      "chapters": []
+    },
+    {
+      "id": 16,
+      "name": "느헤미야",
+      "englishName": "Nehemiah",
+      "abbreviation": "느",
+      "testament": "old",
+      "totalChapters": 13,
+      "chapters": []
+    },
+    {
+      "id": 17,
+      "name": "에스더",
+      "englishName": "Esther",
+      "abbreviation": "에",
+      "testament": "old",
+      "totalChapters": 10,
+      "chapters": []
+    },
+    {
+      "id": 18,
+      "name": "욥기",
+      "englishName": "Job",
+      "abbreviation": "욥",
+      "testament": "old",
+      "totalChapters": 42,
+      "chapters": []
+    },
+    {
+      "id": 19,
+      "name": "시편",
+      "englishName": "Psalms",
+      "abbreviation": "시",
+      "testament": "old",
+      "totalChapters": 150,
+      "chapters": []
+    },
+    {
+      "id": 20,
+      "name": "잠언",
+      "englishName": "Proverbs",
+      "abbreviation": "잠",
+      "testament": "old",
+      "totalChapters": 31,
+      "chapters": []
+    },
+    {
+      "id": 21,
+      "name": "전도서",
+      "englishName": "Ecclesiastes",
+      "abbreviation": "전",
+      "testament": "old",
+      "totalChapters": 12,
+      "chapters": []
+    },
+    {
+      "id": 22,
+      "name": "아가",
+      "englishName": "Song of Solomon",
+      "abbreviation": "아",
+      "testament": "old",
+      "totalChapters": 8,
+      "chapters": []
+    },
+    {
+      "id": 23,
+      "name": "이사야",
+      "englishName": "Isaiah",
+      "abbreviation": "사",
+      "testament": "old",
+      "totalChapters": 66,
+      "chapters": []
+    },
+    {
+      "id": 24,
+      "name": "예레미야",
+      "englishName": "Jeremiah",
+      "abbreviation": "렘",
+      "testament": "old",
+      "totalChapters": 52,
+      "chapters": []
+    },
+    {
+      "id": 25,
+      "name": "예레미야 애가",
+      "englishName": "Lamentations",
+      "abbreviation": "애",
+      "testament": "old",
+      "totalChapters": 5,
+      "chapters": []
+    },
+    {
+      "id": 26,
+      "name": "에스겔",
+      "englishName": "Ezekiel",
+      "abbreviation": "겔",
+      "testament": "old",
+      "totalChapters": 48,
+      "chapters": []
+    },
+    {
+      "id": 27,
+      "name": "다니엘",
+      "englishName": "Daniel",
+      "abbreviation": "단",
+      "testament": "old",
+      "totalChapters": 12,
+      "chapters": []
+    },
+    {
+      "id": 28,
+      "name": "호세아",
+      "englishName": "Hosea",
+      "abbreviation": "호",
+      "testament": "old",
+      "totalChapters": 14,
+      "chapters": []
+    },
+    {
+      "id": 29,
+      "name": "요엘",
+      "englishName": "Joel",
+      "abbreviation": "욜",
+      "testament": "old",
+      "totalChapters": 3,
+      "chapters": []
+    },
+    {
+      "id": 30,
+      "name": "아모스",
+      "englishName": "Amos",
+      "abbreviation": "암",
+      "testament": "old",
+      "totalChapters": 9,
+      "chapters": []
+    },
+    {
+      "id": 31,
+      "name": "오바댜",
+      "englishName": "Obadiah",
+      "abbreviation": "오",
+      "testament": "old",
+      "totalChapters": 1,
+      "chapters": []
+    },
+    {
+      "id": 32,
+      "name": "요나",
+      "englishName": "Jonah",
+      "abbreviation": "욘",
+      "testament": "old",
+      "totalChapters": 4,
+      "chapters": []
+    },
+    {
+      "id": 33,
+      "name": "미가",
+      "englishName": "Micah",
+      "abbreviation": "미",
+      "testament": "old",
+      "totalChapters": 7,
+      "chapters": []
+    },
+    {
+      "id": 34,
+      "name": "나훔",
+      "englishName": "Nahum",
+      "abbreviation": "나",
+      "testament": "old",
+      "totalChapters": 3,
+      "chapters": []
+    },
+    {
+      "id": 35,
+      "name": "하박국",
+      "englishName": "Habakkuk",
+      "abbreviation": "합",
+      "testament": "old",
+      "totalChapters": 3,
+      "chapters": []
+    },
+    {
+      "id": 36,
+      "name": "스바냐",
+      "englishName": "Zechariah",
+      "abbreviation": "습",
+      "testament": "old",
+      "totalChapters": 3,
+      "chapters": []
+    },
+    {
+      "id": 37,
+      "name": "학개",
+      "englishName": "Haggai",
+      "abbreviation": "학",
+      "testament": "old",
+      "totalChapters": 2,
+      "chapters": []
+    },
+    {
+      "id": 38,
+      "name": "스가랴",
+      "englishName": "Zechariah",
+      "abbreviation": "슥",
+      "testament": "old",
+      "totalChapters": 14,
+      "chapters": []
+    },
+    {
+      "id": 39,
+      "name": "말라기",
+      "englishName": "Malachi",
+      "abbreviation": "말",
+      "testament": "old",
+      "totalChapters": 4,
+      "chapters": []
     },
     {
       "id": 40,
@@ -84,17 +459,241 @@
       "abbreviation": "마",
       "testament": "new",
       "totalChapters": 28,
-      "chapters": [
-        {
-          "chapterNumber": 1,
-          "verses": [
-            {
-              "verseNumber": 1,
-              "text": "아브라함과 다윗의 자손 예수 그리스도의 계보라"
-            }
-          ]
-        }
-      ]
+      "chapters": []
+    },
+    {
+      "id": 41,
+      "name": "마가복음",
+      "englishName": "Mark",
+      "abbreviation": "막",
+      "testament": "new",
+      "totalChapters": 16,
+      "chapters": []
+    },
+    {
+      "id": 42,
+      "name": "누가복음",
+      "englishName": "Luke",
+      "abbreviation": "눅",
+      "testament": "new",
+      "totalChapters": 24,
+      "chapters": []
+    },
+    {
+      "id": 43,
+      "name": "요한복음",
+      "englishName": "John",
+      "abbreviation": "요",
+      "testament": "new",
+      "totalChapters": 21,
+      "chapters": []
+    },
+    {
+      "id": 44,
+      "name": "사도행전",
+      "englishName": "Acts",
+      "abbreviation": "행",
+      "testament": "new",
+      "totalChapters": 28,
+      "chapters": []
+    },
+    {
+      "id": 45,
+      "name": "로마서",
+      "englishName": "Romans",
+      "abbreviation": "롬",
+      "testament": "new",
+      "totalChapters": 16,
+      "chapters": []
+    },
+    {
+      "id": 46,
+      "name": "고린도전서",
+      "englishName": "1 Corinthians",
+      "abbreviation": "고전",
+      "testament": "new",
+      "totalChapters": 16,
+      "chapters": []
+    },
+    {
+      "id": 47,
+      "name": "고린도후서",
+      "englishName": "2 Corinthians",
+      "abbreviation": "고후",
+      "testament": "new",
+      "totalChapters": 13,
+      "chapters": []
+    },
+    {
+      "id": 48,
+      "name": "갈라디아서",
+      "englishName": "Galatians",
+      "abbreviation": "갈",
+      "testament": "new",
+      "totalChapters": 6,
+      "chapters": []
+    },
+    {
+      "id": 49,
+      "name": "에베소서",
+      "englishName": "Ephesians",
+      "abbreviation": "엡",
+      "testament": "new",
+      "totalChapters": 6,
+      "chapters": []
+    },
+    {
+      "id": 50,
+      "name": "빌립보서",
+      "englishName": "Philippians",
+      "abbreviation": "빌",
+      "testament": "new",
+      "totalChapters": 4,
+      "chapters": []
+    },
+    {
+      "id": 51,
+      "name": "골로새서",
+      "englishName": "Colossians",
+      "abbreviation": "골",
+      "testament": "new",
+      "totalChapters": 4,
+      "chapters": []
+    },
+    {
+      "id": 52,
+      "name": "데살로니가전서",
+      "englishName": "1 Thessalonians",
+      "abbreviation": "살전",
+      "testament": "new",
+      "totalChapters": 5,
+      "chapters": []
+    },
+    {
+      "id": 53,
+      "name": "데살로니가후서",
+      "englishName": "2 Thessalonians",
+      "abbreviation": "살후",
+      "testament": "new",
+      "totalChapters": 3,
+      "chapters": []
+    },
+    {
+      "id": 54,
+      "name": "디모데전서",
+      "englishName": "1 Timothy",
+      "abbreviation": "딤전",
+      "testament": "new",
+      "totalChapters": 6,
+      "chapters": []
+    },
+    {
+      "id": 55,
+      "name": "디모데후서",
+      "englishName": "2 Timothy",
+      "abbreviation": "딤후",
+      "testament": "new",
+      "totalChapters": 4,
+      "chapters": []
+    },
+    {
+      "id": 56,
+      "name": "디도서",
+      "englishName": "Titus",
+      "abbreviation": "딛",
+      "testament": "new",
+      "totalChapters": 3,
+      "chapters": []
+    },
+    {
+      "id": 57,
+      "name": "빌레몬서",
+      "englishName": "Philemon",
+      "abbreviation": "몬",
+      "testament": "new",
+      "totalChapters": 1,
+      "chapters": []
+    },
+    {
+      "id": 58,
+      "name": "히브리서",
+      "englishName": "Hebrews",
+      "abbreviation": "히",
+      "testament": "new",
+      "totalChapters": 13,
+      "chapters": []
+    },
+    {
+      "id": 59,
+      "name": "야고보서",
+      "englishName": "James",
+      "abbreviation": "약",
+      "testament": "new",
+      "totalChapters": 5,
+      "chapters": []
+    },
+    {
+      "id": 60,
+      "name": "베드로전서",
+      "englishName": "1 Peter",
+      "abbreviation": "벧전",
+      "testament": "new",
+      "totalChapters": 5,
+      "chapters": []
+    },
+    {
+      "id": 61,
+      "name": "베드로후서",
+      "englishName": "2 Peter",
+      "abbreviation": "벧후",
+      "testament": "new",
+      "totalChapters": 3,
+      "chapters": []
+    },
+    {
+      "id": 62,
+      "name": "요한일서",
+      "englishName": "1 John",
+      "abbreviation": "요일",
+      "testament": "new",
+      "totalChapters": 5,
+      "chapters": []
+    },
+    {
+      "id": 63,
+      "name": "요한이서",
+      "englishName": "2 John",
+      "abbreviation": "요이",
+      "testament": "new",
+      "totalChapters": 1,
+      "chapters": []
+    },
+    {
+      "id": 64,
+      "name": "요한삼서",
+      "englishName": "3 John",
+      "abbreviation": "요삼",
+      "testament": "new",
+      "totalChapters": 1,
+      "chapters": []
+    },
+    {
+      "id": 65,
+      "name": "유다서",
+      "englishName": "Jude",
+      "abbreviation": "유",
+      "testament": "new",
+      "totalChapters": 1,
+      "chapters": []
+    },
+    {
+      "id": 66,
+      "name": "요한계시록",
+      "englishName": "Revelation",
+      "abbreviation": "계",
+      "testament": "new",
+      "totalChapters": 22,
+      "chapters": []
     }
   ]
 }
