@@ -7,6 +7,7 @@ import '../../theme/app_text_styles.dart';
 import '../../widgets/download_progress_dialog.dart';
 import 'package:logger/logger.dart';
 import '../../l10n/app_strings.dart';
+import '../../services/notification_service.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 import '../onboarding/onboarding_screen.dart';
@@ -162,8 +163,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SwitchListTile(
             title: Text(AppStrings.get('daily_notification', lang)),
             value: preferences.isNotificationEnabled,
-            onChanged: (value) {
-              userProvider.savePreference('isNotificationEnabled', value);
+            onChanged: (value) async {
+              if (value) {
+                // Show reasoning dialog first
+                final bool? confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text(
+                      AppStrings.get('notification_permission_title', lang),
+                    ),
+                    content: Text(
+                      AppStrings.get('notification_permission_content', lang),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: Text(AppStrings.get('deny', lang)),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: Text(AppStrings.get('allow', lang)),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirmed == true) {
+                  userProvider.savePreference('isNotificationEnabled', true);
+                  await NotificationService().requestPermissions();
+                  await NotificationService().scheduleDailyNotification(
+                    time: preferences.dailyNotificationTime,
+                    title: AppStrings.get('daily_reading_title', lang),
+                    body: AppStrings.get('daily_reading_body', lang),
+                  );
+                } else {
+                  // Revert switch if denied
+                  userProvider.savePreference('isNotificationEnabled', false);
+                }
+              } else {
+                userProvider.savePreference('isNotificationEnabled', false);
+                await NotificationService().cancelAll();
+              }
             },
           ),
 
@@ -180,6 +220,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   userProvider.savePreference(
                     'dailyNotificationTime',
                     '${picked.hour}:${picked.minute}',
+                  );
+                  // Reschedule with new time
+                  await NotificationService().scheduleDailyNotification(
+                    time: picked,
+                    title: AppStrings.get('daily_reading_title', lang),
+                    body: AppStrings.get('daily_reading_body', lang),
                   );
                 }
               },

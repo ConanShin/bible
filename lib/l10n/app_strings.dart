@@ -90,6 +90,11 @@ class AppStrings {
         'error_loading_bible': '성경 데이터를 불러오는 중 오류가 발생했습니다.',
         'daily_reading_title': '오늘의 말씀',
         'daily_reading_body': '하루의 시작을 하나님의 말씀과 함께하세요.',
+        'notification_permission_title': '알림 설정',
+        'notification_permission_content':
+            '매일 말씀을 받아보시겠습니까?\n이를 위해 알림 권한 허용이 필요합니다.',
+        'allow': '허용',
+        'deny': '거부',
       },
       'en': {
         'next': 'Next',
@@ -179,6 +184,11 @@ class AppStrings {
         'error_loading_bible': 'An error occurred while loading Bible data.',
         'daily_reading_title': 'Daily Reading',
         'daily_reading_body': 'Start your day with God\'s word.',
+        'notification_permission_title': 'Enable Notifications',
+        'notification_permission_content':
+            'Would you like to receive daily verses?\nThis requires notification permission.',
+        'allow': 'Allow',
+        'deny': 'Deny',
       },
     };
 

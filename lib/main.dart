@@ -10,9 +10,12 @@ import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/main_app.dart';
 import 'services/bible_service.dart';
 
+import 'services/notification_service.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await MobileAds.instance.initialize();
+  await NotificationService().initialize();
   runApp(const BibleApp());
 }
 
