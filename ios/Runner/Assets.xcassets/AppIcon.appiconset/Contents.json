@@ -341,6 +341,30 @@
       "filename": "1024.png",
       "idiom": "mac",
       "scale": "2x"
+    },
+    {
+      "idiom": "universal",
+      "platform": "ios",
+      "size": "1024x1024",
+      "appearances": [
+        {
+          "appearance": "luminance",
+          "value": "dark"
+        }
+      ],
+      "filename": "AppIcon-Dark.png"
+    },
+    {
+      "idiom": "universal",
+      "platform": "ios",
+      "size": "1024x1024",
+      "appearances": [
+        {
+          "appearance": "luminance",
+          "value": "tinted"
+        }
+      ],
+      "filename": "AppIcon-Tinted.png"
     }
   ]
 }
