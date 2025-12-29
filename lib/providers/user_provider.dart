@@ -21,6 +21,24 @@ class UserProvider with ChangeNotifier {
   bool _hasCompletedOnboarding = false;
   bool get hasCompletedOnboarding => _hasCompletedOnboarding;
 
+  UserProvider() {
+    _initDefaultLanguage();
+  }
+
+  void _initDefaultLanguage() {
+    try {
+      final systemLocale =
+          WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+      if (systemLocale == 'ko') {
+        _preferences.appLanguage = 'ko';
+      } else {
+        _preferences.appLanguage = 'en';
+      }
+    } catch (_) {
+      // Fallback already set to 'en' in UserPreferences
+    }
+  }
+
   Future<void> loadPreferences() async {
     _isLoading = true;
     notifyListeners();

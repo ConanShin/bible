@@ -250,11 +250,23 @@ class LocalStorageService {
       // Fallback if binding not initialized
     }
 
+    // Determine default language from system settings
+    String defaultLanguage = 'ko';
+    try {
+      final systemLocale =
+          WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+      if (systemLocale == 'en' || systemLocale == 'ko') {
+        defaultLanguage = systemLocale;
+      }
+    } catch (_) {
+      // Fallback to 'ko'
+    }
+
     return UserPreferences(
       isDarkMode: sp.getBool(KEY_THEME_MODE) ?? defaultDarkMode,
       fontSize: sp.getDouble(KEY_FONT_SIZE) ?? 16.0,
       selectedBibleVersion: version,
-      appLanguage: sp.getString(KEY_APP_LANGUAGE) ?? 'ko',
+      appLanguage: sp.getString(KEY_APP_LANGUAGE) ?? defaultLanguage,
       isNotificationEnabled: sp.getBool(KEY_NOTIF_ENABLED) ?? false,
       dailyNotificationTime: TimeOfDay(
         hour: sp.getInt(KEY_NOTIF_TIME_HOUR) ?? 6,
