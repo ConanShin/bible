@@ -58,6 +58,7 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen>
   }
 
   void _onBookSelected(BibleBook book) {
+    FocusScope.of(context).unfocus();
     setState(() {
       _selectedBook = book;
     });
@@ -65,6 +66,7 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen>
   }
 
   void _onChapterSelected(BibleChapter chapter) {
+    FocusScope.of(context).unfocus();
     setState(() {
       _selectedChapter = chapter;
     });
@@ -72,6 +74,7 @@ class _BibleSelectionScreenState extends State<BibleSelectionScreen>
   }
 
   void _onVerseSelected(int verseNumber) async {
+    FocusScope.of(context).unfocus();
     if (_selectedBook != null && _selectedChapter != null) {
       // Save to reading history
       context.read<UserProvider>().addToHistory(
