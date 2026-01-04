@@ -1,4 +1,4 @@
-package com.example.bible_app
+package com.conan.simple_bible
 
 import io.flutter.embedding.android.FlutterActivity
 

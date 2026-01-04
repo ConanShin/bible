@@ -1,0 +1,34 @@
+Running Gradle task 'assembleRelease'...                        
+Font asset "MaterialIcons-Regular.otf" was tree-shaken, reducing it from 1645184 to 4140 bytes (99.7% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+/Users/1112846/.pub-cache/hosted/pub.dev/flutter_local_notifications-16.3.3/android/src/main/java/com/dexterous/flutterlocalnotifications/FlutterLocalNotificationsPlugin.java:1033: error: reference to bigLargeIcon is ambiguous
+      bigPictureStyle.bigLargeIcon(null);
+                     ^
+  both method bigLargeIcon(Bitmap) in BigPictureStyle and method bigLargeIcon(Icon) in BigPictureStyle match
+1 error
+3 warnings
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':flutter_local_notifications:compileReleaseJavaWithJavac'.
+> Compilation failed; see the compiler output below.
+  /Users/1112846/.pub-cache/hosted/pub.dev/flutter_local_notifications-16.3.3/android/src/main/java/com/dexterous/flutterlocalnotifications/FlutterLocalNotificationsPlugin.java:1033: error: reference to bigLargeIcon is ambiguous
+        bigPictureStyle.bigLargeIcon(null);
+                       ^
+    both method bigLargeIcon(Bitmap) in BigPictureStyle and method bigLargeIcon(Icon) in BigPictureStyle match
+  warning: [options] target value 8 is obsolete and will be removed in a future release
+  warning: [options] source value 8 is obsolete and will be removed in a future release
+  warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+  1 error
+  3 warnings
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights.
+
+BUILD FAILED in 5s
+Running Gradle task 'assembleRelease'...                            5.9s
+Gradle task assembleRelease failed with exit code 1

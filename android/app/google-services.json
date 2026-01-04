@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "339568150860",
+    "project_id": "simple-bible-by-conan",
+    "storage_bucket": "simple-bible-by-conan.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:339568150860:android:85f315c1c44358b86b27e9",
+        "android_client_info": {
+          "package_name": "com.conan.simple_bible"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxD8Kiy-Q3rO8lYXGi8ObMl6w758T_TrA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

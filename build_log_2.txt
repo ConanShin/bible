@@ -1,0 +1,31 @@
+Running Gradle task 'assembleRelease'...                        
+lib/services/notification_service.dart:25:35: Error: A value of type 'TimezoneInfo' can't be assigned to a variable of type 'String'.
+ - 'TimezoneInfo' is from 'package:flutter_timezone/timezone_info.dart' ('../../../.pub-cache/hosted/pub.dev/flutter_timezone-5.0.1/lib/timezone_info.dart').
+      final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+                                  ^
+lib/services/notification_service.dart:122:13: Error: The getter 'UILocalNotificationDateInterpretation' isn't defined for the type 'NotificationService'.
+ - 'NotificationService' is from 'package:bible_app/services/notification_service.dart' ('lib/services/notification_service.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'UILocalNotificationDateInterpretation'.
+            UILocalNotificationDateInterpretation.absoluteTime,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/services/notification_service.dart:121:9: Error: No named parameter with the name 'uiLocalNotificationDateInterpretation'.
+        uiLocalNotificationDateInterpretation:
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Target kernel_snapshot_program failed: Exception
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileFlutterBuildRelease'.
+> Process 'command '/Users/1112846/fvm/versions/3.38.5/bin/flutter'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 8s
+Running Gradle task 'assembleRelease'...                            8.9s
+Gradle task assembleRelease failed with exit code 1
