@@ -11,6 +11,7 @@ import 'screens/main_app.dart';
 import 'services/bible_service.dart';
 
 import 'services/notification_service.dart';
+import 'screens/splash/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,8 +83,11 @@ class _AppRootState extends State<AppRoot> {
     final userProvider = context.watch<UserProvider>();
 
     if (userProvider.isLoading) {
-      return const MaterialApp(
-        home: Scaffold(body: Center(child: CircularProgressIndicator())),
+      return MaterialApp(
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+        home: const SplashScreen(),
       );
     }
 
