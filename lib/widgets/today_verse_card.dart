@@ -21,7 +21,7 @@ class TodayVerseCard extends StatelessWidget {
     final userProvider = context.watch<UserProvider>();
     final isBookmarked = userProvider.bookmarks.any(
       (v) =>
-          v.text == verse.text &&
+          v.verseText == verse.text &&
           v.bookName == verse.bookName &&
           v.chapterNumber == verse.chapterNumber &&
           v.verseNumber == verse.verseNumber,

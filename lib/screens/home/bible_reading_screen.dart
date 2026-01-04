@@ -48,8 +48,20 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
   }
 
   void _loadBannerAd() {
+    final adUnitId = AdService.getBannerAdUnitId(
+      context.read<UserProvider>().isAdFree,
+    );
+
+    if (adUnitId == null) {
+      setState(() {
+        _isAdLoaded = false;
+        _bannerAd = null;
+      });
+      return;
+    }
+
     _bannerAd = BannerAd(
-      adUnitId: AdService.bannerAdUnitId,
+      adUnitId: adUnitId,
       request: const AdRequest(),
       size: AdSize.banner,
       listener: BannerAdListener(
@@ -60,6 +72,9 @@ class _BibleReadingScreenState extends State<BibleReadingScreen> {
         },
         onAdFailedToLoad: (ad, err) {
           ad.dispose();
+          setState(() {
+            _isAdLoaded = false;
+          });
         },
       ),
     )..load();

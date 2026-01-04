@@ -22,6 +22,7 @@ class LocalStorageService {
   static const String KEY_NOTIF_TIME_MINUTE = 'notification_time_minute';
   static const String KEY_APP_LANGUAGE = 'app_language';
   static const String KEY_BOOKMARKS = 'bookmarks';
+  static const String KEY_IS_AD_FREE = 'is_ad_free';
 
   static Database? _database;
   final Logger _logger = Logger();
@@ -233,6 +234,7 @@ class LocalStorageService {
     await sp.setBool(KEY_NOTIF_ENABLED, prefs.isNotificationEnabled);
     await sp.setInt(KEY_NOTIF_TIME_HOUR, prefs.dailyNotificationTime.hour);
     await sp.setInt(KEY_NOTIF_TIME_MINUTE, prefs.dailyNotificationTime.minute);
+    await sp.setBool(KEY_IS_AD_FREE, prefs.isAdFree);
   }
 
   Future<UserPreferences> getUserPreferences() async {
@@ -272,6 +274,7 @@ class LocalStorageService {
         hour: sp.getInt(KEY_NOTIF_TIME_HOUR) ?? 6,
         minute: sp.getInt(KEY_NOTIF_TIME_MINUTE) ?? 0,
       ),
+      isAdFree: sp.getBool(KEY_IS_AD_FREE) ?? false,
     );
   }
 
@@ -359,6 +362,51 @@ class LocalStorageService {
 
     return List.generate(maps.length, (i) {
       return Bookmark.fromJson(maps[i]);
+    });
+  }
+
+  // --- Export / Import ---
+
+  Future<Map<String, dynamic>> exportUserData() async {
+    final bookmarks = await getBookmarks();
+    final history = await getHistory();
+
+    return {
+      'version': 1,
+      'exportedAt': DateTime.now().toIso8601String(),
+      'bookmarks': bookmarks.map((b) => b.toJson()).toList(),
+      'history': history, // Already a list of maps from db
+    };
+  }
+
+  Future<void> importUserData(Map<String, dynamic> data) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      // Clear existing data
+      await txn.delete(BookmarkTable.tableName);
+      await txn.delete(ReadingHistoryTable.tableName);
+
+      // Import bookmarks
+      if (data['bookmarks'] != null) {
+        for (var bookmarkData in data['bookmarks']) {
+          await txn.insert(
+            BookmarkTable.tableName,
+            bookmarkData,
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+        }
+      }
+
+      // Import history
+      if (data['history'] != null) {
+        for (var historyData in data['history']) {
+          await txn.insert(
+            ReadingHistoryTable.tableName,
+            historyData,
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+        }
+      }
     });
   }
 }

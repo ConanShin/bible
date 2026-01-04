@@ -81,6 +81,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.11"
+  device_info_plus:
+    dependency: "direct main"
+    description:
+      name: device_info_plus
+      sha256: "4df8babf73058181227e18b08e6ea3520cf5fc5d796888d33b7cb0f33f984b7c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "12.3.0"
+  device_info_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: device_info_plus_platform_interface
+      sha256: e1ea89119e34903dca74b883d0dd78eb762814f97fb6c76f35e9ff74d261a18f
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.0.3"
   dio:
     dependency: "direct main"
     description:
@@ -129,6 +145,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.1"
+  file_picker:
+    dependency: "direct main"
+    description:
+      name: file_picker
+      sha256: d974b6ba2606371ac71dd94254beefb6fa81185bde0b59bdc1df09885da85fde
+      url: "https://pub.dev"
+    source: hosted
+    version: "10.3.8"
   fixnum:
     dependency: transitive
     description:
@@ -187,6 +211,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_plugin_android_lifecycle:
+    dependency: transitive
+    description:
+      name: flutter_plugin_android_lifecycle
+      sha256: ee8068e0e1cd16c4a82714119918efdeed33b3ba7772c54b5d094ab53f9b7fd1
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.33"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -237,6 +269,38 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  in_app_purchase:
+    dependency: "direct main"
+    description:
+      name: in_app_purchase
+      sha256: "5cddd7f463f3bddb1d37a72b95066e840d5822d66291331d7f8f05ce32c24b6c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.3"
+  in_app_purchase_android:
+    dependency: transitive
+    description:
+      name: in_app_purchase_android
+      sha256: abb254ae159a5a9d4f867795ecb076864faeba59ce015ab81d4cca380f23df45
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0+8"
+  in_app_purchase_platform_interface:
+    dependency: transitive
+    description:
+      name: in_app_purchase_platform_interface
+      sha256: "1d353d38251da5b9fea6635c0ebfc6bb17a2d28d0e86ea5e083bf64244f1fb4c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.0"
+  in_app_purchase_storekit:
+    dependency: transitive
+    description:
+      name: in_app_purchase_storekit
+      sha256: f7cbbd7fb47ab5a4fb736fc3f20ae81a4f6def0af9297b3c525ca727761e2589
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.7"
   intl:
     dependency: "direct main"
     description:
@@ -245,6 +309,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.20.2"
+  json_annotation:
+    dependency: transitive
+    description:
+      name: json_annotation
+      sha256: "1ce844379ca14835a50d2f019a3099f419082cfdd231cd86a142af94dd5c6bb1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.9.0"
   leak_tracker:
     dependency: transitive
     description:
@@ -334,7 +406,7 @@ packages:
     source: hosted
     version: "1.9.1"
   path_provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path_provider
       sha256: "50c5dd5b6e1aaf6fb3a78b33f6aa3afca52bf903a8a5298f53101fdaee55bbcd"
@@ -738,6 +810,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.15.0"
+  win32_registry:
+    dependency: transitive
+    description:
+      name: win32_registry
+      sha256: "6f1b564492d0147b330dd794fee8f512cec4977957f310f9951b5f9d83618dae"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   xdg_directories:
     dependency: transitive
     description:

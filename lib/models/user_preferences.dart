@@ -7,6 +7,7 @@ class UserPreferences {
   bool isDarkMode;
   TimeOfDay dailyNotificationTime;
   bool isNotificationEnabled;
+  bool isAdFree;
 
   UserPreferences({
     this.selectedBibleVersion = '',
@@ -15,5 +16,6 @@ class UserPreferences {
     this.isDarkMode = false,
     this.dailyNotificationTime = const TimeOfDay(hour: 6, minute: 0),
     this.isNotificationEnabled = false,
+    this.isAdFree = false,
   });
 }

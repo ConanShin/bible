@@ -11,6 +11,12 @@ import '../../services/notification_service.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 import '../onboarding/onboarding_screen.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import '../../services/iap_service.dart';
 
 String? encodeQueryParameters(Map<String, String> params) {
   return params.entries
@@ -232,6 +238,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
 
           const Divider(),
+          _buildSectionTitle(AppStrings.get('data_management', lang)),
+
+          // Export
+          ListTile(
+            title: Text(AppStrings.get('backup_data', lang)),
+            subtitle: Text(AppStrings.get('backup_data_sub', lang)),
+            leading: const Icon(Icons.upload_file),
+            onTap: () => _exportData(context),
+          ),
+
+          // Import
+          ListTile(
+            title: Text(AppStrings.get('restore_data', lang)),
+            subtitle: Text(AppStrings.get('restore_data_sub', lang)),
+            leading: const Icon(Icons.download_for_offline),
+            onTap: () => _showImportConfirmation(context),
+          ),
+
+          const Divider(),
+          _buildSectionTitle(AppStrings.get('premium_features', lang)),
+
+          // Remove Ads
+          ListTile(
+            title: Text(AppStrings.get('remove_ads', lang)),
+            subtitle: Text(
+              preferences.isAdFree
+                  ? AppStrings.get('ads_removed_status', lang)
+                  : AppStrings.get('remove_ads_sub', lang),
+            ),
+            trailing: preferences.isAdFree
+                ? const Icon(Icons.check_circle, color: Colors.green)
+                : const Icon(Icons.shopping_cart),
+            onTap: preferences.isAdFree
+                ? null
+                : () => _purchaseRemoveAds(context),
+          ),
+          if (!preferences.isAdFree)
+            ListTile(
+              leading: const Icon(Icons.restore),
+              title: Text(AppStrings.get('restore_purchase', lang)),
+              subtitle: Text(AppStrings.get('restore_purchase_sub', lang)),
+              onTap: () async {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(AppStrings.get('restoring', lang))),
+                );
+                await IapService().restorePurchases();
+              },
+            ),
+
+          const Divider(),
           _buildSectionTitle(AppStrings.get('etc', lang)),
 
           ListTile(
@@ -333,6 +389,124 @@ class _SettingsScreenState extends State<SettingsScreen> {
           (route) => false,
         );
       }
+    }
+  }
+
+  Future<void> _exportData(BuildContext context) async {
+    try {
+      final userProvider = context.read<UserProvider>();
+      final data = await userProvider.exportData();
+      final jsonString = jsonEncode(data);
+
+      final tempDir = await getTemporaryDirectory();
+      final file = File(
+        '${tempDir.path}/bible_backup_${DateTime.now().millisecondsSinceEpoch}.json',
+      );
+      await file.writeAsString(jsonString);
+
+      await Share.shareXFiles([XFile(file.path)], text: 'Bible App Backup');
+    } catch (e) {
+      _logger.e('Export error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('백업 중 오류가 발생했습니다.')));
+      }
+    }
+  }
+
+  Future<void> _showImportConfirmation(BuildContext context) async {
+    final lang = context.read<UserProvider>().preferences.appLanguage;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppStrings.get('restore_confirm_title', lang)),
+        content: Text(AppStrings.get('restore_confirm_content', lang)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(AppStrings.get('cancel', lang)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(AppStrings.get('restore', lang)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      _importData(context);
+    }
+  }
+
+  Future<void> _importData(BuildContext context) async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+      );
+
+      if (result != null && result.files.single.path != null) {
+        final file = File(result.files.single.path!);
+        final jsonString = await file.readAsString();
+        final data = jsonDecode(jsonString);
+
+        if (mounted) {
+          final userProvider = context.read<UserProvider>();
+          final bibleProvider = context.read<BibleProvider>();
+          await userProvider.importData(data, bibleProvider);
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  AppStrings.get(
+                    'restore_success',
+                    userProvider.preferences.appLanguage,
+                  ),
+                ),
+              ),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      _logger.e('Import error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('복원 중 오류가 발생했습니다.')));
+      }
+    }
+  }
+
+  Future<void> _purchaseRemoveAds(BuildContext context) async {
+    // For demo/testing, we can show a mock dialog or trigger simulateSuccess
+    final lang = context.read<UserProvider>().preferences.appLanguage;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppStrings.get('remove_ads', lang)),
+        content: Text(AppStrings.get('remove_ads_confirm', lang)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(AppStrings.get('cancel', lang)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(AppStrings.get('purchase', lang)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      // Start the real purchase process
+      await IapService().buyRemoveAds();
+      // Note: Success feedback is handled by the purchase listener in IapService
+      // which updates UserProvider, causing the UI to refresh.
     }
   }
 

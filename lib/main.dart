@@ -12,6 +12,7 @@ import 'services/bible_service.dart';
 
 import 'services/notification_service.dart';
 import 'screens/splash/splash_screen.dart';
+import 'services/iap_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,6 +64,9 @@ class _AppRootState extends State<AppRoot> {
         context.read<ThemeProvider>().setDarkMode(
           userProvider.preferences.isDarkMode,
         );
+
+        // Initialize IAP
+        IapService().initialize(userProvider);
 
         // 2. Load Bible data with the SAVED version
         bibleProvider

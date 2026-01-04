@@ -39,6 +39,8 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  bool get isAdFree => _preferences.isAdFree;
+
   Future<void> loadPreferences() async {
     _isLoading = true;
     notifyListeners();
@@ -183,6 +185,14 @@ class UserProvider with ChangeNotifier {
     await _storage.deleteBookmark(id);
   }
 
+  Future<void> toggleBookmark(BibleVerse verse) async {
+    if (isBookmarked(verse)) {
+      await removeBookmark(verse);
+    } else {
+      await addBookmark(verse);
+    }
+  }
+
   Future<void> deleteBookmarkById(String id) async {
     _bookmarks.removeWhere((b) => b.id == id);
     notifyListeners();
@@ -235,5 +245,35 @@ class UserProvider with ChangeNotifier {
     print(
       "Saved to persistent history: ${book.name} $chapterNumber:$verseNumber",
     );
+  }
+
+  // Export / Import
+  Future<Map<String, dynamic>> exportData() async {
+    return await _storage.exportUserData();
+  }
+
+  Future<void> importData(
+    Map<String, dynamic> data,
+    BibleProvider bibleProvider,
+  ) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _storage.importUserData(data);
+      // Reload in-memory data
+      await loadUserData(bibleProvider);
+    } catch (e) {
+      print('Error importing data: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> setAdFree(bool value) async {
+    _preferences.isAdFree = value;
+    await _storage.saveUserPreferences(_preferences);
+    notifyListeners();
   }
 }

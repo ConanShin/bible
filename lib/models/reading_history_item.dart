@@ -12,4 +12,13 @@ class ReadingHistoryItem {
     required this.verseNumber,
     required this.timestamp,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'bookId': book.id,
+      'chapterNumber': chapterNumber,
+      'verseNumber': verseNumber,
+      'timestamp': timestamp.toIso8601String(),
+    };
+  }
 }
